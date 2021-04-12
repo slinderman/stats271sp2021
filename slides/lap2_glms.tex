@@ -17,13 +17,28 @@
 \begin{frame}{Announcements}
 
 \begin{itemize}
-    \item Lecture slides are available on Canvas.
+    \item Lecture slides and course content on Github: \url{https://github.com/slinderman/stats271sp2021}
     
-    \item Homework 1 due Friday (Apr 9). 
-    
-    \item Homework 2 posted Friday (Apr 9) and due next Friday (April 16).
+    \item Homework 2 due Friday (April 16).
 \end{itemize}
     
+\end{frame}
+
+\begin{frame}{Final Projects}
+    \begin{itemize}
+        \item \textbf{Goal:} Go through Box's Loop on a real dataset.
+        \begin{itemize}
+        \item Find an interesting real dataset, e.g. from your own research, a recent paper, or a public repository. (Synthetic datasets are not sufficient.)
+        \item Develop a model. 
+        \item Think carefully about Bayesian inference algorithms and run one.
+        \item Evaluate your model, then revise it in light of your analysis. 
+        \item Repeat...
+        \item Present your results and findings in the form of a short report. 
+        \end{itemize}
+        
+    \item You may work individually or in a team of two.
+    \item Proposals due late April/early May (TBD).
+    \end{itemize}
 \end{frame}
 
 \begin{frame}{Survey Results}
@@ -235,15 +250,6 @@ where $\mbzero \in \reals^P$ and $\sigma^2 \in \reals_+$ are the mean and varian
 \end{flushright}
 \end{frame}
 
-\begin{frame}{Box's Loop: Infer hidden quantities}
-\begin{center}
-\includegraphics[width=.85\linewidth]{figures/lap1/boxsloop.jpeg}\\
-\end{center} 
-\begin{flushright}
-{\footnotesize Blei, \textit{Ann. Rev. Stat. App.} 2014.}
-\end{flushright}
-\end{frame}
-
 
 \begin{frame}{Maximum a posteriori (MAP) estimation}
 
@@ -384,7 +390,7 @@ does not have a closed form solution.
 To motivate this, consider a second-order Taylor approximation to the log posterior,
 \begin{align}
     \cL(\mbw) &\approx \cL(\mbw_{\mathsf{MAP}}) + (\mbw - \mbw_{\mathsf{MAP}})^\top \underbrace{\nabla_{\mbw} \cL(\mbw_{\mathsf{MAP}})}_{\mbzero \text{ at the mode}} + \frac{1}{2} (\mbw - \mbw_{\mathsf{MAP}})^\top \nabla^2_{\mbw} \cL(\mbw_{\mathsf{MAP}}) (\mbw - \mbw_{\mathsf{MAP}}) \\
-    &= -\frac{1}{2} (\mbw - \mbw_{\mathsf{MAP}})^\top \mbSigma \cL(\mbw_{\mathsf{MAP}}) (\mbw - \mbw_{\mathsf{MAP}}) + c \\
+    &= -\frac{1}{2} (\mbw - \mbw_{\mathsf{MAP}})^\top \mbSigma^{-1} (\mbw - \mbw_{\mathsf{MAP}}) + c \\
     &= \log \cN(\mbw \mid \mbw_{\mathsf{MAP}}, \mbSigma) 
 \end{align}
 where $\mbSigma = - [\nabla^2_{\mbw} \cL(\mbw_{\mathsf{MAP}})]^{-1} $
@@ -595,7 +601,7 @@ where $\hat{\mbV} = \diag([\hat{v}_1, \ldots, \hat{v}_N])$ and $\hat{\mbz} = \ha
 This is \emph{iteratively reweighted least squares} (IRLS) with weights $\hat{v}_n$ and targets $\hat{z}_n = \frac{y_n - \hat{y}_n}{\hat{v}_n}$, both of which are functions of the current weights $\mbw$.
 \end{frame}
 
-\begin{frame}{Next time: Posterior predictive checks}
+\begin{frame}{Model evaluation via predictive likelihood}
 \begin{center}
 \includegraphics[width=.85\linewidth]{figures/lap1/boxsloop.jpeg}\\
 \end{center} 
@@ -603,6 +609,146 @@ This is \emph{iteratively reweighted least squares} (IRLS) with weights $\hat{v}
 {\footnotesize Blei, \textit{Ann. Rev. Stat. App.} 2014.}
 \end{flushright}
 \end{frame}
+
+\begin{frame}{Measures of predictive accuracy}
+    One way to evaluate a model is through the accuracy of its predictions.
+    
+    For example, given a \textit{point estimate} $\hat{\theta}$, the \textit{mean squared error} summarizes predictive accuracy as,
+    \begin{align}
+        \frac{1}{N_{\mathsf{test}}} \sum_{n=1}^{N_{\mathsf{test}}} (y_n - \E[y_n \mid \hat{\theta}])^2
+    \end{align}
+    
+    In \textit{probabilistic prediction} (aka \textit{probabilistic forecasting}), we report a distribution over parameters $\theta$. In Bayesian data analysis, this is the posterior distribution $p(\theta \mid \{y_n\}_{n=1}^N)$. 
+    
+    The \emph{posterior predictive distribution} averages over the posterior to make a prediction,
+    \begin{align}
+        p(y_{n'} \mid \{y_n\}_{n=1}^N) &= \int p(y_{n'} \mid \theta) \, p(\theta \mid \{y_n\}_{n=1}^N) \dif \theta,
+    \end{align}
+    weighting parameters by their posterior probability.
+
+\end{frame}
+
+\begin{frame}{Scoring rules}
+
+    A \emph{scoring rule} measures the accuracy of a probabilistic prediction. 
+    
+    The \emph{logarithmic scoring rule} is unique in that it is both \textit{proper} and \textit{local}. 
+    
+    The \textit{log predictive likelihood} of new datapoint $y_{n'}$ is,
+    \begin{align}
+        \log p(y_{n'} \mid \{y_n\}_{n=1}^N) &= \log \int p(y_{n'} \mid \theta) \, p(\theta \mid \{y_n\}_{n=1}^N) \dif \theta.
+    \end{align}
+    
+\end{frame}
+
+\begin{frame}{Averaging over the distribution of future data}
+    Ideally, we would measure the expected out-of-sample predictive performance,
+    \begin{align}
+        \E_{f(y)}[\log p(y \mid \{y_n\}_{n=1}^N)] &= \int \log p(y \mid \{y_n\}_{n=1}^N) \, f(y) \dif y
+    \end{align}
+    where $f(y)$ is the true, but unknown data-generating distribution.
+    
+    BDA3 calls this the \emph{expected out-of-sample log predictive density} (elpd). 
+    
+    But we don't know $f$! Instead, we approximate it with,
+    \begin{align}
+        \frac{1}{N_{\mathsf{test}}} \sum_{n'=1}^{N_{\mathsf{test}}} \log p(y_{n'} \mid \{y_n\}_{n=1}^N)
+    \end{align}
+    for some \emph{test dataset} $\{y_{n'}\}_{n'=1}^{N_{\mathsf{test}}}$.
+\end{frame}
+
+\begin{frame}{Estimating out-of-sample predictive accuracy with available data}
+    
+    \begin{itemize}
+        \item Naively, the \emph{within-sample} predictive accuracy takes the test set to be the training set. As such, it over-estimates the the predictive accuracy.
+    
+    \item \emph{Information criteria} like the AIC, DIC, and WAIC try to correct for this bias by penalizing the within-sample estimate.
+    
+    \item \emph{Cross-validation} splits the data into train and test to approximate the predictive likelihood. 
+    
+    \item Hardcore Bayesians don't like to withhold data when computing the posterior. Nevertheless, cross-validated predictive log likelihood is the current standard. 
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Akaike Information Criterion (AIC)}
+    
+    The \emph{Akaike information criterion} (AIC) is based on an asymptotic normal approximation to the posterior.
+    
+    It corrects for the bias of the within-sample log likelihood by accounting for the number of parameters (an approximation to the amnount of overfitting),
+    \begin{align}
+        -\frac{1}{2} \mathrm{AIC} = \sum_{n=1}^N \log p(y_n \mid \theta_{\mathsf{MLE}}) - K,
+    \end{align}
+    where $K$ is the number of parameters. 
+    
+    The AIC makes some sense for linear models with uniform priors, but not so much for more complicated models. 
+    
+\end{frame}
+
+\begin{frame}{Deviance Information Criterion (DIC)}
+    
+    The \emph{deviance information criterion} (DIC) makes two changes,
+    
+    \begin{enumerate}
+        \item Replace the MLE with the posterior mean, $\bar{\theta} = \E_{p(\theta | y)}[\theta]$.
+        \item Replace $K$ with a bias correction based on the data.
+    \end{enumerate}
+    Then,
+    \begin{align}
+        -\frac{1}{2} \mathrm{DIC} = \sum_{n=1}^N \log p(y_n \mid \bar{\theta}) - K_{\mathsf{DIC}}
+    \end{align}
+    where
+    \begin{align}
+        K_{\mathsf{DIC}} &= 2 \left( \log \sum_{n=1}^N p(y_n \mid \bar{\theta}) - \E_{p(\theta | y)} \left[ \log \sum_{n=1}^N p(y_n \mid \theta) \right] \right)
+    \end{align}
+    
+    An alternative definition uses,
+    \begin{align}
+        K_{\mathsf{DIC}} &= 2 \mathrm{Var}_{p(\theta | y)} \left[ \log \sum_{n=1}^N p(y_n \mid \bar{\theta} \right] 
+    \end{align}
+\end{frame}
+
+\begin{frame}{Watanabe-Akaike Information Criterion (WAIC)}
+    
+    The \emph{Watanabe-Akaike information criterion} (WAIC) is similar to the DIC with,
+    \begin{align}
+        K_{\mathsf{WAIC}} &= 2 \left( \log \sum_{n=1}^N \E_{p(\theta | y)} [p(y_n \mid \theta)] - \E_{p(\theta | y)} \left[ \log \sum_{n=1}^N p(y_n \mid \theta) \right] \right)
+    \end{align}
+    
+    An alternative definition uses,
+    \begin{align}
+        K_{\mathsf{WAIC}} &= \sum_{n=1}^N \mathrm{Var}_{p(\theta | y)} \left[ \log p(y_n \mid \bar{\theta} \right],
+    \end{align}
+    
+    Then, the WAIC is,
+    \begin{align}
+        -\frac{1}{2} \mathrm{WAIC} &= \sum_{n=1}^N \log \int p(y_n \mid \theta) \, p(\theta \mid \{y_n\}_{n=1}^N \dif \theta - K_{\mathsf{WAIC}}
+    \end{align}
+    
+\end{frame}
+
+\begin{frame}{Leave-one-out cross validation}
+    
+    \textbf{Idea: } approximate out-of-sample predictive accuracy by randomly splitting the training data. 
+    
+    \textit{Leave-one-out} cross validation (LOOCV) withholds one datapoint out at a time, computes the posterior given the other $N-1$, and then evaluates predictive likelihood on the held out datapoint.
+    
+    \begin{align}
+        \E_{f(y)}[\log p(y \mid \{y_n\}_{n=1}^N)] &\approx
+        \frac{1}{N} \sum_{n=1}^N \log p(y_n \mid \{y_m\}_{m\neq n}).
+    \end{align}
+    
+    For small $N$ (or when using a small number of folds), a bias-correction can be used. (See pg. 175-176 of the book.)
+    
+    Cross-validated predictive log likelihood estimates are similar to the \emph{jackknife} resampling method in the sense that it is estimating an expectation wrt the unknown data-generating distribution $f$ by resampling the given data. 
+    
+    Thus, it measures the frequentist properties of a Bayesian procedure.
+    
+\end{frame}
+
+% \begin{frame}{Next time: Lap 3: Robust/hierarchical models and MCMC}
+    
+% \end{frame}
 
 
 \end{document}
