@@ -1,0 +1,483 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{simple}
+
+\input{preamble/preamble.tex}
+\input{preamble/preamble_math.tex}
+% \input{preamble/preamble_acronyms.tex}
+
+\title{STATS271/371: Applied Bayesian Statistics}
+\subtitle{Robust regression models and Intro to MCMC}
+\author{Scott Linderman
+\\
+{\footnotesize (Some slides are adapted from unpublished notes by David Blei.)}}
+\date{\today}
+
+
+\begin{document}
+
+
+\maketitle
+
+
+\begin{frame}{Box's Loop}
+\begin{center}
+\includegraphics[width=.85\linewidth]{figures/lap1/boxsloop.jpeg}\\
+\end{center} 
+\begin{flushright}
+{\footnotesize Blei, \textit{Ann. Rev. Stat. App.} 2014.}
+\end{flushright}
+\end{frame}
+
+\begin{frame}{Lap 3: Robust regress models and Intro to MCMC}
+\begin{itemize}
+    \item \textbf{Model:} Robust regression models
+    \item \textbf{Algorithm:} Markov chain Monte Carlo (specifically, HMC)
+    \item \textbf{Criticism:} MCMC Diagnostics
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Robustness to outliers}
+\begin{columns}
+\begin{column}{.5\textwidth}
+Consider the following model:
+\begin{align*}
+    y_n &\sim \begin{cases}
+    \cN(\mbw^\top \mbx_n, \sigma^2) & \text{with prob } 0.85 \\
+    \cN(0, \sigma_{\mathsf{out}}^2) & \text{o.w.}
+    \end{cases}
+\end{align*}
+where $\sigma_{\mathsf{out}}^2 \gg \sigma^2$.
+\end{column}
+
+\begin{column}{.5\textwidth}
+\includegraphics[width=\textwidth]{figures/lap3/data.pdf}
+\end{column}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}{Robustness to outliers II}
+
+A standard Bayesian linear regression (Lap 1) compensates by inferring different weights and a larger variance.
+
+\centering
+\includegraphics[width=.49\textwidth]{figures/lap3/data.pdf}
+\includegraphics[width=.49\textwidth]{figures/lap3/post_pred.pdf}
+
+\end{frame}
+
+\begin{frame}{Robustness to outliers III}
+We also see this in the posterior distribution of the weights...
+
+\centering
+\includegraphics[width=.9\textwidth]{figures/lap3/w_post.pdf}
+\end{frame}
+
+\begin{frame}{Robustness to outliers IV}
+...And in the posterior distribution of the variance
+
+\centering
+\includegraphics[width=.5\textwidth]{figures/lap3/sigmasq_post.pdf}
+\end{frame}
+
+\begin{frame}{Robust modeling with heavy tailed distributions}
+One way to allow for outliers is via a discrete mixture distribution, like we used to simulate this data. More on this next week!
+
+Mixtures are one way of creating \textit{heavy tailed} conditional distributions. I.e. they place more probability mass on observations far from the mean or mode.
+
+Heavier tails allow the model to effectively downweight some observations when inferring the weights. In the discrete mixture example, if we knew which data points came from the outlier distribution, we would simply ignore them (set their weights to zero) when calculating the posterior distribution of the regression coefficients.
+
+Of course, we don't \textit{a priori} which datapoints are inliers and which are outliers.  
+
+Robust inference largely amounts to \textit{figuring out how to weight different observations} during inference.
+
+\end{frame}
+
+\begin{frame}{Student's t as a scale-mixture of Gaussians}
+The Student's t distribution takes the discrete mixture idea to a continuous limit.
+
+We can view the Student's distribution as a continuous \textit{scale-mixture of Gaussians},
+\begin{align}
+    t(y \mid \mu, \tau^2, \nu) &= \int \cN(y \mid \mu, \sigma^2) \, \distInvChiSq(\sigma^2 \mid \nu, \tau^2) \dif \sigma^2 \\
+    &= \frac {\Gamma ({\frac {\nu +1}{2}})}{\Gamma ({\frac {\nu }{2}}){\sqrt {\pi \nu \tau^2}}} \left(1+{\frac {1}{\nu \tau^2}}\left(y-\mu \right)^{2}\right)^{-{\frac {\nu +1}{2}}}
+\end{align}
+
+Equivalently, we can think of $y \sim t(\mu, \tau^2, \nu)$ as arising from a two-step sampling procedure,
+\begin{align}
+    \sigma^2 &\sim \distInvChiSq(\nu, \tau^2) \\
+    y &\sim \cN(\mu, \sigma^2).
+\end{align}
+First sample a random variance, then sample a Gaussian observation.
+
+Look familiar? Recall the posterior predictive distribution in Bayesian linear regression.
+
+\end{frame}
+
+\begin{frame}{The Student's t distribution has heavy tails}
+
+As the degree of freedom parameter $\nu$ goes to infinity, the Student's t converges to a Gaussian.
+
+\centering
+\includegraphics[width=.49\textwidth]{figures/lap3/t_pdf.pdf}
+\includegraphics[width=.49\textwidth]{figures/lap3/t_logpdf.pdf}    
+
+\end{frame}
+
+\begin{frame}{Robust regression with Student's t noise model}
+
+\textbf{Simple idea: } replace the normal distribution in Bayesian linear regression with a Student's t.
+
+\begin{align}
+    y_n \sim t(\mbw^\top \mbx_n, \tau^2, \nu) \iff 
+    \sigma_n^2 &\sim \distInvChiSq(\nu, \tau^2)  \\
+    y_n &\sim \cN(\mbw^\top \mbx_n, \sigma_n^2).
+\end{align}
+
+We can think of this as giving each datapoint its own random variance $\sigma_n^2$.
+
+How does this relate to ``reweighting'' various datapoints? Suppose we somehow knew the variances $\sigma_n^2$ and just needed to infer the parameters $\mbw$. Recall that sufficient statistics for $\mbw$ where $\sum_{n=1}^N \frac{y_n \mbx_n}{\sigma_n^2}$, $\sum_{n=1}^N \frac{\mbx_n \mbx_n^\top }{\sigma_n^2}$, and $\sum_{n=1}^N \frac{1}{\sigma_n^2}$. Effectively, datapoints with larger variance contribute less to the sufficient statistics.
+
+\end{frame}
+
+\begin{frame}{Probabilistic model}
+
+Unfortunately, we don't know the variances (knowing the variances is like knowing which datapoints are outliers) so we have to work with the $t$ distribution instead.
+
+Our likelihood is,
+\begin{align}
+    p(\{y_n\}_{n=1}^N \mid \mbw, \tau^2, \nu, \{\mbx_n\}_{n=1}^N) 
+    &= \prod_{n=1}^N t(y_n \mid \mbw^\top \mbx_n, \tau^2, \nu) \\
+    &= \prod_{n=1}^N \frac {\Gamma ({\frac {\nu +1}{2}})}{\Gamma ({\frac {\nu }{2}}){\sqrt {\pi \nu \tau^2}}} \left(1+{\frac {1}{\nu \tau^2}}\left(y_n-\mbw^\top \mbx_n \right)^{2}\right)^{-{\frac {\nu +1}{2}}}
+\end{align}
+This doesn't simplify, but it is differentiable and easy to compute any point $(\mbw, \tau^2, \nu)$.
+
+To complete the model, assume a broad Gaussian prior on the \emph{log} of non-negative parameters,
+\begin{align}
+    p(\log \tau^2, \log \nu) &= \cN(\log \tau^2 \mid 0, 3) \, \cN(\log \nu \mid 0, 3),
+\end{align}
+and an improper uniform prior on the weights.
+
+A Gaussian prior on the log of a parameter is equivalent to a \textit{log normal} prior on the parameter.
+
+\end{frame}
+
+\begin{frame}{Visualizing the log joint probability}
+\centering
+\includegraphics[width=.6\textwidth]{figures/lap3/robust_w_post.pdf}
+\end{frame}
+
+\begin{frame}{Visualizing the log joint probability II}
+\centering
+\includegraphics[width=.7\textwidth]{figures/lap3/robust_post.pdf}
+\end{frame}
+
+\begin{frame}{MAP Estimation}
+
+Again, the posterior doesn't have a simple analytical form, but we can still try our tools from last week. E.g. we can use black box optimizers to find the mode.
+
+\centering
+\includegraphics[width=.7\textwidth]{figures/lap3/robust_post2.pdf}
+    
+\end{frame}
+
+\begin{frame}{Predictive distribution with $\mbw_{\mathsf{MAP}}$}
+
+The MAP estimate of the parameters yields a much better estimate of the weights by allowing for a heavy tailed distribution of outliers.
+
+\centering
+\includegraphics[width=.49\textwidth]{figures/lap3/data.pdf}
+\includegraphics[width=.49\textwidth]{figures/lap3/robust_map_pred.pdf}
+    
+\end{frame}
+
+
+\begin{frame}{Lap 3: Robust models and MCMC}
+\begin{itemize}
+    \item \textbf{Model:} Robust models
+    \item \textbf{Algorithm:} Markov chain Monte Carlo (specifically, HMC)
+    \item \textbf{Criticism:} MCMC Diagnostics
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Notation}
+\begin{itemize}
+    \item Let $\mbtheta \in \Theta$ denote the model parameters. 
+    \begin{itemize}
+        \item In robust regression, $\mbtheta = (\mbw, \tau^2, \nu) \in \reals^P \times \reals_+ \times \reals_+$.
+    \end{itemize}
+    
+    \item Let $\cD = \{\mbx_n, y_n\}_{n=1}^N$ denote the observed data.
+\end{itemize}
+    
+\end{frame}
+
+\begin{frame}{Posterior expectations}
+% Approximate expectations under the posterior via samples
+The central object of Bayesian inference is the posterior distribution, $p(\mbtheta \mid \cD)$.
+
+However, we almost always interact with the posterior distribution through \emph{expectations}.
+
+\begin{itemize}
+    \item $\E_{p(\mbtheta | \cD)}[\mbtheta]$, the posterior mean.
+    \item $\E_{p(\mbtheta | \cD)}[\bbI[\mbtheta \in \cA]]$, the probability of the parameters being in set $\cA$.
+    \item $\E_{p(\mbtheta | \cD)}[p(\cD' \mid \mbtheta)]$, the posterior predictive density of new data $\cD'$.
+\end{itemize}
+
+All of these can be written as $\E_{p(\mbtheta | \cD)}[f(\mbtheta)]$ for some function $f$.
+
+(One exception is the posterior mode, which is not so easily expressed as an expectation.)
+\end{frame}
+
+\begin{frame}{Approximating posterior expectations}
+Generally, we can't analytically compute posterior expectations. (\emph{Why not?})
+    
+In these cases, we need to resort to approximations.
+
+For example, we could use \emph{quadrature methods} like Simpon's rule or the trapezoid rule to numerically approximate the integral over $\Theta$. 
+
+Roughly,
+\begin{align}
+    \E_{p(\mbtheta | \cD)}[f(\mbtheta)] &\approx \sum_{m=}^M p(\mbtheta_m \mid \cD) \, f(\mbtheta_m) \, \Delta_m
+\end{align}
+where $\mbtheta_m \subset \Theta$ is a grid of points and $\Delta_m$ is a volume around that point.
+
+This works for low dimensional problems (say, up to $5$ dimensions), but the number of points ($M$) needed to get a good estimate grows exponentially with the parameter dimension.
+
+\end{frame}
+
+\begin{frame}{Monte Carlo approximations}
+
+\textbf{Idea:} approximate the expectation via sampling,
+
+\begin{align}
+    \E_{p(\mbtheta | \cD)}[f(\mbtheta)] &\approx \frac{1}{S} \sum_{s=1}^S f(\mbtheta_s) 
+    \quad \text{where} \quad
+    \mbtheta_s \sim p(\mbtheta \mid \cD).
+\end{align}
+
+Let $\hat{f} = \frac{1}{S} \sum_{s=1}^S f(\mbtheta_s)$ denote the Monte Carlo estimate. It is a random variable, since it's a function of random samples $\mbtheta_s$. 
+
+As such we can reason about its mean and variance. Clearly,
+\begin{align}
+    \E[\hat{f}] = \frac{1}{S} \sum_{s=1}^S \E_{p(\mbtheta | \cD)}[f(\mbtheta)] = \E_{p(\mbtheta | \cD)}[f(\mbtheta)].
+\end{align}
+Thus, $\hat{f}$ is an \emph{unbiased} estimate of the desired expectation.
+
+\end{frame}
+
+\begin{frame}{Monte Carlo approximations II}
+
+What about its variance?
+\begin{align}
+    \mathrm{Var}[\hat{f}] 
+    &= \mathrm{Var} \left(\frac{1}{S} \sum_{s=1}^S f(\mbtheta_s) \right) \\
+    &= \frac{1}{S^2} \left( \sum_{s=1}^S \mathrm{Var}[f(\mbtheta)] + 2 \sum_{1 \leq s < s' \leq S} \mathrm{Cov} [f(\mbtheta_s),  f(\mbtheta_{s'})] \right)
+\end{align}
+
+If the samples are not only identically distributed but also \emph{uncorrelated}, then~$\mathrm{Var}[\hat{f}] = \frac{1}{S} \mathrm{Var}[f(\mbtheta)]$.
+
+In this case, the \emph{root mean squared error} (RMSE) of the estimate is $\sqrt{\mathrm{Var}[\hat{f}]} = O(S^{-\frac{1}{2}})$.
+
+Compare this to Simpson's rule, which for smooth 1D problems has error rate~$O(S^{-4})$. That's roughly 8 times better!
+
+However, for multidimensional problems, Simpson's rule is $O(S^{-\frac{4}{P}})$, whereas the \textbf{error rate of Monte Carlo does not depend on the dimensionality!}
+
+\end{frame}
+
+\begin{frame}{The Catch}
+
+So far so good: we'll just draw a lot of samples to drive down our Monte Carlo error. 
+
+\textbf{Here's the catch!} How do you draw samples from the posterior $p(\mbtheta \mid \cD)$?
+
+We're interested in Monte Carlo for cases where the posterior does not admit a simple closed form!
+
+In general, sampling the posterior is as hard as computing the marginal likelihood. 
+
+\end{frame}
+
+\begin{frame}{Markov chain Monte Carlo (MCMC)}
+
+\textbf{Idea:} Design a Markov chain whose stationary distribution is the posterior.
+    
+\centering
+\includegraphics[width=.5\textwidth]{figures/lap3/robust_w_post.pdf}
+
+\end{frame}
+
+\begin{frame}{Markov chains}
+    
+A \emph{Markov chain} is a joint distribution of a sequence of variables, $\pi(\mbtheta_1, \mbtheta_2, \ldots, \mbtheta_S)$.
+
+(To avoid confusion with the model $p$, we denote the densities associated with the Markov chain by $\pi$.)
+
+The Markov chain factorizes so that each variable is drawn conditional on the previous variable,
+\begin{align}
+    \pi(\mbtheta_1, \mbtheta_2, \ldots, \mbtheta_S)
+    &= 
+    \pi_{1}(\mbtheta_1) \prod_{s=2}^S \pi(\mbtheta_s \mid \mbtheta_{s-1}).
+\end{align}
+This is called the \emph{Markov property}.
+
+The distribution $\pi_1(\mbtheta_1)$ is called the \textit{initial distribution}.
+
+The distribution $\pi(\mbtheta_s \mid \mbtheta_{s-1})$ is called the \textit{transition distribution}. If the transition distribution is the same for each $s$, the Markov chain is \textit{homogenous}.
+\end{frame}
+
+\begin{frame}{Stationary distributions}
+Let $\pi_s(\mbtheta_s)$ denote the marginal distribution of sample $\mbtheta_s$. It can be obtained recursively as,
+\begin{align}
+    \pi_s(\mbtheta_s) &= \int \pi_{s-1}(\mbtheta_{s-1}) \, \pi(\mbtheta_s \mid \mbtheta_{s-1}) \dif \mbtheta_{s-1}.
+\end{align}
+We are interested in the asymptotic behavior of the marginal distributions as $s \to \infty$.
+
+A distribution $\pi^*(\mbtheta)$ is a \textbf{stationary distribution} if,
+\begin{align}
+    \pi^*(\mbtheta) &= \int \pi^*(\mbtheta') \, \pi(\mbtheta \mid \mbtheta') \dif \mbtheta'.
+\end{align}
+That is, suppose the marginal of sample $\mbtheta'$ is $\pi^*(\mbtheta)$. Then the marginal of the next time point is also~$\pi^*(\mbtheta)$.
+\end{frame}
+
+\begin{frame}{Detailed balance}
+    
+% \textbf{Our goal} is to design a Markov chain where \textit{the posterior distribution is the unique stationary distribution}. That is, we want~$\pi^*(\mbtheta) = p(\mbtheta \mid \cD)$.
+
+How can we relate transition distributions and stationary distributions?
+
+A sufficient (but not necessary) condition for $\pi^*(\mbtheta)$ to be a stationary distribution is that it satisfies \textit{detailed balance},
+\begin{align}
+    \pi^*(\mbtheta') \pi(\mbtheta \mid \mbtheta') &=
+    \pi^*(\mbtheta) \pi(\mbtheta' \mid \mbtheta) 
+\end{align}
+In words, the probability of starting at $\mbtheta'$ and moving to $\mbtheta$ is the same as that of starting at $\mbtheta$ and moving to $\mbtheta'$, if you draw the starting point from the stationary distribution.
+
+To see that detailed balance is sufficient, integrate both sides to get,
+\begin{align}
+    \int \pi^*(\mbtheta') \pi(\mbtheta \mid \mbtheta') \dif \mbtheta'
+    &=
+    \int \pi^*(\mbtheta) \pi(\mbtheta' \mid \mbtheta) \dif \mbtheta'
+    =
+    \pi^*(\mbtheta) \int \pi(\mbtheta' \mid \mbtheta) \dif \mbtheta'
+    = \pi^*(\mbtheta).
+\end{align}
+Thus, $\pi^*(\mbtheta)$ is a stationary distribution of the Markov chain with transitions $\pi(\theta \mid \theta')$.
+
+\end{frame}
+
+\begin{frame}{Ergodicity}
+Detailed balance can be used to show that $\pi^*(\mbtheta)$ is \textit{a} stationary distribution, but not that it is \textit{the unique} one.
+
+This is where \textit{ergodicity} comes in. A Markov chain is ergodic if $\pi_s(\mbtheta_s) \to \pi^\star(\mbtheta)$ regardless of $\pi_1(\mbtheta_1)$.
+
+An ergodic chain has only one stationary distribution, $\pi^*(\mbtheta)$. 
+
+The easiest way to prove ergodicity is to show that it is possible to reach any $\mbtheta'$ from any other $\mbtheta$. E.g. this is trivially so if $\pi(\mbtheta' \mid \mbtheta) > 0$. 
+
+Note: a more technical definition is that all pairs of sets \textit{communicate}, in which case the chain is \textit{irreducible}, and that each state is \textit{aperiodic}. The definitions can be a bit overwhelming.
+
+\end{frame} 
+
+\begin{frame}{The Metropolis-Hastings algorithm}
+
+Finally we come to our \textbf{main objective}: designing a Markov chain for which \textit{the posterior is the unique stationary distribution.} 
+
+That is, we want $\pi^*(\mbtheta) = p(\mbtheta \mid \cD)$.
+
+Recall our \textbf{constraint}: we can only compute the joint probability (the numerator in Bayes' rule), not the marginal likelihood (the denominator).
+
+Fortunately, that still allows us to compute ratios of posterior densities! We have,
+\begin{align}
+    \frac{p(\mbtheta \mid \cD)}{p(\mbtheta' \mid \cD)} 
+    &= 
+    \frac{p(\mbtheta, \cD)}{p(\cD)} \frac{p(\cD)}{p(\mbtheta',  \cD)} 
+    = \frac{p(\mbtheta, \cD)}{p(\mbtheta',  \cD)}.
+\end{align}
+    
+\end{frame}
+
+\begin{frame}{The Metropolis-Hastings algorithm II}
+    
+Now rearrange the detailed balance condition to relate ratios of transition probabilities to ratios of joint probabilities,
+\begin{align}
+    \label{eq:transition_constraint}
+    \frac{\pi(\mbtheta \mid \mbtheta')}{\pi(\mbtheta' \mid \mbtheta)}
+    &= 
+    \frac{\pi^*(\mbtheta)}{\pi^*(\mbtheta')}
+    = 
+    \frac{p(\mbtheta \mid \cD)}{p(\mbtheta' \mid \cD)}
+    = 
+    \frac{p(\mbtheta, \cD)}{p(\mbtheta',  \cD)}
+\end{align}
+
+To construct such a transition distribution $\pi(\mbtheta \mid \mbtheta')$, break it down into two steps. 
+\begin{enumerate}
+    \item Sample a proposal $\mbtheta$ from a \emph{proposal distribution} $q(\mbtheta \mid \mbtheta')$,
+    \item Accept the proposal with \emph{acceptance probability}~$a(\mbtheta' \to \mbtheta)$. (Otherwise, set $\mbtheta = \mbtheta'$.)
+\end{enumerate}
+
+Thus,
+\begin{align}
+    \pi(\mbtheta \mid \mbtheta') &= 
+    \begin{cases}
+    q(\mbtheta \mid \mbtheta') \, a(\mbtheta' \to \mbtheta) & \text{if } \mbtheta' \neq \mbtheta \\
+    \int q(\mbtheta'' \mid \mbtheta') \, (1 - a(\mbtheta' \to \mbtheta'')) \dif \mbtheta'' & \text{if } \mbtheta' = \mbtheta
+    \end{cases}
+\end{align}
+
+\end{frame}
+
+\begin{frame}{The Metropolis-Hastings algorithm III}
+The constraint in \eqref{eq:transition_constraint} is trivially satisfied when $\mbtheta = \mbtheta'$. When $\mbtheta \neq \mbtheta'$, we need
+\begin{multline}
+    \frac{\pi(\mbtheta \mid \mbtheta')}{\pi(\mbtheta' \mid \mbtheta)}
+    = 
+    \frac{q(\mbtheta \mid \mbtheta') \, a(\mbtheta' \to \mbtheta)}{q(\mbtheta' \mid \mbtheta) \, a(\mbtheta \to \mbtheta')}
+    = 
+    \frac{p(\mbtheta, \cD)}{p(\mbtheta',  \cD)}
+    \Rightarrow
+    \frac{a(\mbtheta' \to \mbtheta)}{a(\mbtheta \to \mbtheta')}
+    = 
+    \underbrace{\frac{p(\mbtheta, \cD) \, q(\mbtheta' \mid \mbtheta)}{p(\mbtheta',  \cD) \, q(\mbtheta \mid \mbtheta') }}_{\triangleq A(\mbtheta' \to \mbtheta)}
+\end{multline}
+
+WLOG, assume $ A(\mbtheta' \to \mbtheta) \leq 1$. (If it's not, its inverse $A(\mbtheta \to \mbtheta')$ must be.) 
+
+A simple way to ensure detailed balance is to set $a(\mbtheta' \to \mbtheta) = A(\mbtheta' \to \mbtheta)$ and $a(\mbtheta \to \mbtheta') = 1$. 
+
+We can succinctly capture both cases with,
+\begin{align}
+    a(\mbtheta' \to \mbtheta) &= 
+    \min \left\{1, \, A(\mbtheta' \to \mbtheta) \right \} = 
+    \min \left\{1, \, \frac{p(\mbtheta, \cD) \, q(\mbtheta' \mid \mbtheta)}{p(\mbtheta',  \cD) \, q(\mbtheta \mid \mbtheta')} \right \}.
+\end{align}
+
+\end{frame} 
+
+\begin{frame}{The Metropolis algorithm}
+    Now consider the special case in which the proposal distribution is symmetric; i.e. $q(\mbtheta \mid \mbtheta') = q(\mbtheta' \mid \mbtheta)$.
+    
+    Then the proposal densities cancel in the acceptance probability and,
+    \begin{align}
+    a(\mbtheta' \to \mbtheta) &= 
+        \min \left\{1, \, \frac{p(\mbtheta, \cD)}{p(\mbtheta',  \cD)} \right \}.
+    \end{align}
+
+    In other words, you accept any proposal that moves ``uphill,'' and only accept ``downhill'' moves with some probability. 
+    
+    This is called the \textit{Metropolis algorithm} and it has close connections to \textit{simulated annealing}.
+\end{frame}
+
+\begin{frame}{Next time}
+    
+    \begin{itemize}
+        \item Bias and variance of MCMC estimates
+        
+        \item Constructing proposal distributions that leverage gradient information.
+        
+        \item MCMC diagnostics
+        
+    \end{itemize}
+    
+\end{frame}
+
+\end{document}
