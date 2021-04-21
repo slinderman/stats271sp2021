@@ -1,0 +1,374 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{simple}
+
+\input{preamble/preamble.tex}
+\input{preamble/preamble_math.tex}
+% \input{preamble/preamble_acronyms.tex}
+
+\title{STATS271/371: Applied Bayesian Statistics}
+\subtitle{Bayesian Mixture Models and (Collapsed) Gibbs Sampling}
+\author{Scott Linderman}
+\date{\today}
+
+
+\begin{document}
+
+
+\maketitle
+
+\begin{frame}{Box's Loop}
+\begin{center}
+\includegraphics[width=.85\linewidth]{figures/lap1/boxsloop.jpeg}\\
+\end{center} 
+\begin{flushright}
+{\footnotesize Blei, \textit{Ann. Rev. Stat. App.} 2014.}
+\end{flushright}
+\end{frame}
+
+\begin{frame}{Lap 4: Bayesian Mixture Models and (Collapsed) Gibbs Sampling}
+\begin{itemize}
+    \item \hyperref[sec:mixtures]{\textbf{Model:} Bayesian mixture models}
+    \item \hyperref[sec:gibbs]{\textbf{Algorithm:} Gibbs sampling}
+    \item \hyperref[sec:ppcs]{\textbf{Criticism:} Posterior predictive checks}
+    \item \hyperref[sec:collapsed_gibbs]{\textbf{Algorithm II:} Collapsed Gibbs sampling}
+\end{itemize}
+\end{frame}
+
+
+\section{Model: Bayesian Mixture Models}
+\label{sec:mixtures}
+
+\begin{frame}{Motivation: Clustering scRNA-seq data}
+\centering
+\includegraphics[width=0.7\textwidth]{figures/lap4/scrnaseq.pdf}
+
+From \citet{Kiselev2019-bt}
+\end{frame}
+
+\begin{frame}{Motivation: Foreground/background segmentation}
+\centering
+\includegraphics[width=0.9\textwidth]{figures/lap4/segmentation.png}
+
+{\footnotesize \url{https://ai.stanford.edu/~syyeung/cvweb/tutorial3.html}}
+\end{frame}
+
+\begin{frame}{Motivation: Density estimation}
+\centering
+\includegraphics[width=0.65\textwidth]{figures/lap4/sphx_glr_plot_species_kde_001.png}
+{\footnotesize \url{https://scikit-learn.org/stable/auto_examples/neighbors/plot_species_kde.html}}
+\end{frame}
+
+\begin{frame}{Notation}
+    
+\textbf{Constants: } Let
+\begin{itemize}
+    \item $N$ denote the number of data points.
+    \item $K$ denote the number of mixture components (i.e. clusters)
+\end{itemize}
+
+\textbf{Data:} Let
+\begin{itemize}
+    \item $\mbx_n \in \reals^D$ denote the $n$-th data point.
+\end{itemize}
+
+\textbf{Latent Variables:} Let
+\begin{itemize}
+    \item $z_n \in \{1, \ldots, K\}$ denote the \textit{assignment} of the $n$-th data point.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Notation II}
+
+\textbf{Parameters:} Let
+\begin{itemize}
+    \item $\mbeta_k$ denote the \textit{natural parameters} of component $k$
+    \item $\mbpi \in \Delta_K$ denote the component \textit{proportions} (i.e. probabilities).
+\end{itemize}
+
+\textbf{Hyperparameters:} Let
+\begin{itemize}
+    \item $\mbphi, \nu$ denote hyperparameters of the prior on $\mbeta$
+    \item $\mbalpha \in \reals_+^{K}$ denote the concentration of the prior on proportions.
+\end{itemize}
+    
+\end{frame}
+
+\begin{frame}{Generative Model}
+
+\begin{enumerate}
+    \item Sample the proportions from a Dirichlet prior:
+    \begin{align}
+        \mbpi &\sim \distDirichlet(\mbalpha) \hspace{10em}
+    \end{align}
+    
+    \item Sample the parameters for each component:
+    \begin{align}
+        \mbeta_k &\iid{\sim} p(\mbeta \mid \mbphi, \nu) \qquad \text{for } k = 1, \ldots, K
+    \end{align}
+    
+    \item Sample the assignment of each data point:
+    \begin{align}
+        z_n &\iid{\sim} \mbpi \hspace{3em} \qquad \text{for } n = 1, \ldots, N
+    \end{align}
+    
+    \item Sample data points given their assignments:
+    \begin{align}
+        \mbx_n &\sim p(\mbx \mid \mbeta_{z_n}) \qquad \text{for } n = 1, \ldots, N
+    \end{align}
+\end{enumerate}
+    
+\end{frame}
+
+\begin{frame}{Joint distribution}
+    This generative model corresponds to the following factorization of the joint distribution,
+    \begin{align}
+        p(\mbpi, \{\mbeta_k\}_{k=1}^K, \{(z_n, \mbx_n)\}_{n=1}^N \mid \mbphi, \nu, \mbalpha) 
+        &= p(\mbpi \mid \mbalpha) \prod_{k=1}^K p(\mbeta_k \mid \mbphi, \nu) \, \prod_{n=1}^N p(z_n \mid \mbpi) \, p(\mbx_n \mid \mbz_n, \{\mbeta_k\}_{k=1}^K)
+    \end{align}
+    
+    Equivalently, 
+    \begin{multline}
+        p(\mbpi, \{\mbeta_k\}_{k=1}^K, \{(z_n, \mbx_n)\}_{n=1}^N \mid \mbphi, \nu, \mbalpha) 
+        = \\
+        p(\mbpi \mid \mbalpha) \prod_{k=1}^K p(\mbeta_k \mid \mbphi, \nu) \, \prod_{n=1}^N \prod_{k=1}^K \left[ \Pr(z_n = k \mid \mbpi) \, p(\mbx_n \mid \mbeta_k) \right]^{\bbI[z_n = k]}
+    \end{multline}
+    
+    Substituting in the assumed forms 
+    \begin{align}
+        p(\mbpi, \{\mbeta_k\}_{k=1}^K, \{(z_n, \mbx_n)\}_{n=1}^N \mid \mbphi, \mbalpha) 
+        =
+        \distDirichlet(\mbpi \mid \mbalpha) \prod_{k=1}^K p(\mbeta_k \mid \mbphi, \nu) \, \prod_{n=1}^N \prod_{k=1}^K \left[ \pi_k \, p(\mbx_n \mid \mbeta_k) \right]^{\bbI[z_n = k]}
+    \end{align}
+\end{frame}
+
+\begin{frame}{Exponential family mixture models}
+    What about $p(\mbx \mid \mbeta_k)$ and $p(\mbeta_k \mid \mbphi, \nu)$?
+    
+    Recall the \textit{exponential family} distributions from Lap 2. Let's assume an exponential family likelihood,
+    \begin{align}
+        p(\mbx \mid \mbeta_k) &= h(\mbx_n) \exp \left \{\langle t(\mbx_n), \mbeta_k \rangle - A(\mbeta_k) \right \}.
+    \end{align}
+    
+    Then assume a \textit{conjugate prior},
+    \begin{align}
+        p(\mbeta_k \mid \mbphi, \nu) &\propto \exp \left \{ \langle \mbphi, \mbeta_k \rangle - \nu A(\mbeta_k) \right \}.
+    \end{align}
+    
+    The hyperparmeters $\mbphi$ are \textit{pseudo-observations} of the sufficient statistics (like statistics from fake data points) and $\nu$ is a \textit{pseudo-count} (like the number of fake data points).
+    
+    Note that the product of prior and likelihood remains in the same family as the prior. That's why we call it conjugate.
+\end{frame}
+
+\begin{frame}{Example: Gaussian mixture model}
+
+Assume the conditional distribution of $\mbx_n$ is a Gaussian with mean $\mbeta_{z_n} \in \reals^D$ and identity covariance,
+\begin{align}
+    p(\mbx_n \mid \mbeta_k) &= \cN(\mbx_n \mid \mbeta_{k}, \mbI) \\
+    &= (2\pi)^{-D/2} \exp \left \{-\tfrac{1}{2} (\mbx_n - \mbeta_k)^\top (\mbx_n - \mbeta_k) \right\} \\
+    &= (2\pi)^{-D/2} \exp \left \{-\tfrac{1}{2} \mbx_n^\top \mbx_n + \mbx_n^\top \mbeta_k - \tfrac{1}{2} \mbeta_k^\top \mbeta_k \right\},
+\end{align}
+which is an exponential family distribution with base measure $h(\mbx_n) = (2\pi)^{-D/2} e^{-\tfrac{1}{2}\mbx_n^\top \mbx_n}$, sufficient statistics $t(\mbx_n) = \mbx_n$, and log normalizer $A(\mbeta_k) = \tfrac{1}{2} \mbeta_k^\top \mbeta_k$.
+
+Then assume a Gaussian prior on the component parameters. It's conjugate,
+\begin{align}
+    p(\mbeta_k \mid \mbphi, \nu) &= \cN(\nu^{-1} \mbphi, \nu^{-1} \mbI) 
+    \propto \exp \left\{\mbphi^\top \mbeta_k -\tfrac{\nu}{2} \mbeta_k^\top \mbeta_k \right\}
+    = \exp \left\{\mbphi^\top \mbeta_k -\nu A(\mbeta_k) \right\}.
+\end{align}
+Note that $\mbphi$ sets the location and $\nu$ sets the precision (i.e. inverse variance). 
+    
+\end{frame}
+
+\section{Algorithm: MAP inference via coordinate ascent}
+\label{sec:map_inference}
+
+\begin{frame}{MAP inference via coordinate ascent}
+Before diving into fully Bayesian inference algorithms, let's first consider \textbf{MAP inference}. 
+
+\textbf{Idea: } find the mode of $p(\mbpi, \{\mbeta_k\}_{k=1}^K, \{z_n\}_{n=1}^N \mid \{\mbx_n\}_{n=1}^N, \mbphi, \nu, \mbalpha)$ by \textbf{coordinate ascent}.
+
+For now, set $\mbphi= \mbzero$, and $\nu=0$ so that the prior is an (improper) uniform distribution. Then maximizing the posterior is equivalent to maximizing the likelihood. 
+
+While we're simplifying, let's even fix $\mbpi = \tfrac{1}{K} \mbone_K$.
+
+\end{frame}
+
+\begin{frame}{Coordinate ascent in the Gaussian mixture model}
+For the Gaussian mixture model (with uniform prior and $\mbpi = \tfrac{1}{K} \mbone_K$), coordinate ascent amounts to:
+\begin{enumerate}
+    \item For each $n=1,\ldots, N$, fix all variables but $z_n$ and find $z_n^\star$ that maximizes
+    \begin{align}
+        p(\mbpi, \{\mbeta_k\}_{k=1}^K, \{(z_n, \mbx_n)\}_{n=1}^N \mid \mbphi, \nu, \mbalpha)
+        &\propto p(\mbx_n \mid z_n, \{\mbeta_k\}_{k=1}^K) 
+        = \cN(\mbx_n \mid \mbeta_{z_n}, \mbI)
+    \end{align}
+    The cluster assignment that maximizes the likelihood is the one with the closest mean to $\mbx_n$, so~set
+    \begin{align}
+        z_n^\star &= \argmin_{k \in \{1,\ldots, K\}} \|\mbx_n - \mbeta_k\|_2.
+    \end{align}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Coordinate ascent in the Gaussian mixture model II}
+\begin{enumerate}
+    \item[2] For each $k=1,\ldots,K$, fix all variables but $\mbeta_k$ and find $\mbeta_k^\star$ that maximizes,
+    \begin{align}
+        p(\mbpi, \{\mbeta_k\}_{k=1}^K, \{(z_n, \mbx_n)\}_{n=1}^N \mid \mbphi, \nu, \mbalpha)
+        &\propto \prod_{n=1}^N p(\mbx_n \mid \mbeta_k)^{\bbI[z_n=k]} \\
+        &\propto \exp \left\{ \sum_{n=1}^N \bbI[z_n=k] \left(\mbx_n^\top \mbeta_k - \tfrac{1}{2} \mbeta_k^\top \mbeta_k \right) \right\}
+    \end{align}
+    Taking the derivative of the log and setting to zero yields,
+    \begin{align}
+        \mbeta_k^\star &= \frac{1}{N_k} \sum_{n=1}^K \bbI[z_n=k] \mbx_n,
+    \end{align}
+    where $N_k = \sum_{n=1}^N \bbI[z_n=k]$.
+\end{enumerate}
+
+This is the \textbf{k-means algorithm}!
+
+\end{frame}
+
+\begin{frame}{Aside: EM in the Gaussian mixture model}
+
+We'll talk more about \textit{coordinate ascent variational inference}~(CAVI) and \textit{expectation-maximization}~(EM) next week. Not to spoil the surprise, but we'll see that they have a similar flavor. Instead of assigning~$z_n^\star$ to the closest cluster, we compute \textit{responsibilities} for each cluster:
+\begin{enumerate}
+    \item For each data point $n$ and component $k$, set the \textit{responsibility} to,
+    \begin{align}
+        \omega_{nk} = \frac{\pi_k \cN(\mbx_n \mid \mbeta_k, \mbI)}{\sum_{j=1}^K \pi_j \cN(\mbx_n \mid \mbeta_j, \mbI)}.
+    \end{align}
+    
+    \item For each component $k$, set the mean to
+    \begin{align}
+        \mbeta_k^\star &= \frac{1}{N_k} \sum_{n=1}^K \omega_{nk} \mbx_n,
+    \end{align}
+    where $N_k = \sum_{n=1}^N \omega_{nk}$.
+\end{enumerate}
+
+Note that EM allows for arbitrary proportions $\mbpi$. Those can be updated as well: for each component $k$, set $\pi_k = \frac{N_k}{N}$.
+
+\end{frame}
+
+\section{Algorithm: Gibbs Sampling}
+\label{sec:gibbs}
+
+
+\begin{frame}{Lap 4: Bayesian Mixture Models and (Collapsed) Gibbs Sampling}
+\begin{itemize}
+    \item \hyperref[sec:mixtures]{Model: Bayesian mixture models}
+    \item \hyperref[sec:gibbs]{\textbf{Algorithm: Gibbs sampling}}
+    \item \hyperref[sec:ppcs]{Criticism: Posterior predictive checks}
+    \item \hyperref[sec:collapsed_gibbs]{Algorithm II: Collapsed Gibbs sampling}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Gibbs sampling in Bayesian mixture models}
+\textbf{Idea: } just like in coordinate ascent, update one variable at a time. \textit{But rather than setting it to its conditional mode, sample from its conditional distribution.}
+\end{frame} 
+    
+\begin{frame}{Gibbs sampling in Bayesian mixture models II}
+\begin{enumerate}
+    \item For each data point $n$, sample a new assignment from the complete conditional distribution
+    \begin{align}
+        z_n &\sim p(z_n \mid \{\mbx_n\}_{n=1}^N, \{z_{n'}\}_{n'\neq n}, \{\mbeta_k\}_{k=1}^K, \mbpi, \mbphi, \nu, \mbalpha).
+    \end{align}
+    Thanks to the factorization of the joint distribution,
+    \begin{align}
+        \Pr(z_n = k \mid -) 
+        &\propto \Pr(z_n =k \mid \mbpi) \, p(x_n \mid \mbeta_k)
+    \end{align}
+    In the Gaussian mixture model, this is,
+    \begin{align}
+        \Pr(z_n = k \mid -) 
+        &= \frac{\pi_k \cN(\mbx_n \mid \mbeta_k, \mbI)}{\sum_{j=1}^K \pi_j \cN(\mbx_n \mid \mbeta_j, \mbI)} \\
+        &\equiv \omega_{nk}.
+    \end{align}
+    I.e., Gibbs sampling generates \textit{random} assignments by sampling according to the responsibilities. 
+\end{enumerate}
+\end{frame} 
+
+\begin{frame}{Gibbs sampling in Bayesian mixture models III}
+\begin{enumerate}
+    \item[2] For each component $k$, sample new parameters from their complete conditional,
+    \begin{align}
+        \mbeta_k &\sim p(\mbeta_k \mid \{(\mbx_n, z_n)\}_{n=1}^N, \{\mbeta_{k'}\}_{k'\neq k}, \mbpi, \mbphi, \nu, \mbalpha).
+    \end{align}
+    Thanks to the factorization of the joint distribution,
+    \begin{align}
+        p(\mbeta_k \mid -) &\propto p(\mbeta_k \mid \mbphi, \nu) \prod_{n: z_n=k} p(x_n \mid \mbeta_k).
+    \end{align}
+    In an Gaussian mixture model,
+    \begin{align}
+        p(\mbeta_k \mid -) &\propto \exp \left\{ \Big( \mbphi + \sum_{n=1}^N \bbI[z_n=k] \mbx_n\Big)^\top \mbeta_k  - \frac{\nu + N_k}{2} \mbeta_k^\top \mbeta_k \right\} \\
+        &\propto \cN\left(\mbeta_k \mid (\nu + N_k)^{-1} \Big(\mbphi + \sum_{n=1}^N \bbI[z_n=k] \mbx_n\Big), \, (\nu + N_k)^{-1} \mbI \right)
+    \end{align}
+    where $N_k = \sum_{n=1}^N \bbI[z_n =k]$. What happens when $N_k \to \infty$?
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Gibbs sampling in Bayesian mixture models IV}
+\begin{enumerate}
+    \item[3] Finally, sample new component proportions from their complete conditional,
+    \begin{align}
+        \mbpi &\sim p(\mbpi \mid \{(\mbx_n, z_n)\}_{n=1}^N, \{\mbeta_{k}\}_{k=1}^K, \mbphi, \nu, \mbalpha).
+    \end{align}
+    Thanks to the factorization of the joint distribution,
+    \begin{align}
+        p(\mbpi \mid -) &\propto \distDirichlet(\mbpi \mid \mbalpha) \prod_{n=1}^N p(z_n \mid \mbpi) \\
+        &\propto \prod_{k=1}^K \pi_k^{\alpha_k - 1} \times \prod_{n=1}^N \prod_{k=1}^K \pi_k^{\bbI[z_n = k]} \\
+        &\propto \distDirichlet \left(\mbpi \mid [\alpha_1 + N_1, \ldots, \alpha_K + N_K] \right)
+    \end{align}
+    where $N_k = \sum_{n=1}^N \bbI[z_n =k]$. What happens when $N_k \to \infty$?
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Gibbs sampling in Bayesian exponential family mixture models}
+What happens in general exponential family models? Step 2 becomes,
+\begin{enumerate}
+    \item[2] For each component $k$, sample new parameters from their complete conditional,
+    \begin{align}
+        p(\mbeta_k \mid -) 
+        &\propto \exp \left\{ \Big\langle \mbphi + \sum_{n=1}^N \bbI[z_n=k] t(\mbx_n), \mbeta_k \Big \rangle - (\nu + N_k) A(\mbeta_k) \right\} \\
+        &= p \left(\mbeta_k \,\Big|\, \mbphi + \sum_{n=1}^N \bbI[z_n=k] \, t(\mbx_n), \nu + N_k \right)
+    \end{align}
+    where $N_k = \sum_{n=1}^N \bbI[z_n =k]$. 
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Opportunities for parallelism}
+    
+\begin{itemize}
+    \item In all three algorithms above, the updates of $z_n$ are independent of one another (once you fix $\{\mbeta_k\}_{k=1}^K$) and hence can be performed in parallel.
+    
+    \item Likewise, the updates of $\mbeta_k$ are independent of one another (once you fix $\{z_n\}_{n=1}^N$) and hence can be performed in parallel.
+    
+    \item In fact, we can write these as simple map-reduce algorithms and take advantage of parallel hardware if it's available.
+    
+    \item In the Gibbs sampling case, updating many variables at once from their combined conditional distribution is called \textbf{blocked Gibbs sampling}, and it's particularly easy when the variables are conditionally independent, as in the Bayesian mixture model.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Next time}
+
+\begin{itemize}
+    \item Show that \textbf{Gibbs is a special case of MH} and, as such, asymptotically generates samples from the posterior distribution.
+    
+    \item Talk about \textbf{posterior predictive checks} and ways of choosing $K$.
+    
+    \item Introduce \textbf{collapsed Gibbs sampling}, which will allow us to generalize to \textbf{nonparametric Bayesian mixture models}.
+\end{itemize}
+    
+\end{frame}
+
+\section{Criticism: Posterior predictive checks}
+\label{sec:ppcs}
+
+\section{Algorithm II: Collapsed Gibbs Sampling}
+\label{sec:collapsed_gibbs}
+
+\begin{frame}[t,allowframebreaks]
+        \frametitle{References}
+        \bibliographystyle{unsrtnat}
+        \bibliography{refs.bib}
+\end{frame}
+
+\end{document}
