@@ -1,0 +1,99 @@
+
+@ARTICLE{Neal2012-ev,
+  title         = "{MCMC} using {H}amiltonian dynamics",
+  author        = "Neal, Radford M",
+  abstract      = "Hamiltonian dynamics can be used to produce distant
+                   proposals for the Metropolis algorithm, thereby avoiding the
+                   slow exploration of the state space that results from the
+                   diffusive behaviour of simple random-walk proposals. Though
+                   originating in physics, Hamiltonian dynamics can be applied
+                   to most problems with continuous state spaces by simply
+                   introducing fictitious ``momentum'' variables. A key to its
+                   usefulness is that Hamiltonian dynamics preserves volume,
+                   and its trajectories can thus be used to define complex
+                   mappings without the need to account for a hard-to-compute
+                   Jacobian factor - a property that can be exactly maintained
+                   even when the dynamics is approximated by discretizing time.
+                   In this review, I discuss theoretical and practical aspects
+                   of Hamiltonian Monte Carlo, and present some of its
+                   variations, including using windows of states for deciding
+                   on acceptance or rejection, computing trajectories using
+                   fast approximations, tempering during the course of a
+                   trajectory to handle isolated modes, and short-cut methods
+                   that prevent useless trajectories from taking much
+                   computation time.",
+  month         =  jun,
+  year          =  2012,
+  archivePrefix = "arXiv",
+  primaryClass  = "stat.CO",
+  eprint        = "1206.1901"
+}
+
+
+@ARTICLE{Andrieu2008-yc,
+  title    = "A tutorial on adaptive {MCMC}",
+  author   = "Andrieu, Christophe and Thoms, Johannes",
+  abstract = "We review adaptive Markov chain Monte Carlo algorithms (MCMC) as
+              a mean to optimise their performance. Using simple toy examples
+              we review their theoretical underpinnings, and in particular show
+              why adaptive MCMC algorithms might fail when some fundamental
+              properties are not satisfied. This leads to guidelines concerning
+              the design of correct algorithms. We then review criteria and the
+              useful framework of stochastic approximation, which allows one to
+              systematically optimise generally used criteria, but also analyse
+              the properties of adaptive MCMC algorithms. We then propose a
+              series of novel adaptive algorithms which prove to be robust and
+              reliable in practice. These algorithms are applied to artificial
+              and high dimensional scenarios, but also to the classic mine
+              disaster dataset inference problem.",
+  journal  = "Stat. Comput.",
+  volume   =  18,
+  number   =  4,
+  pages    = "343--373",
+  month    =  dec,
+  year     =  2008
+}
+
+
+@ARTICLE{Betancourt2017-ml,
+  title         = "A Conceptual Introduction to {H}amiltonian {M}onte {C}arlo",
+  author        = "Betancourt, Michael",
+  abstract      = "Hamiltonian Monte Carlo has proven a remarkable empirical
+                   success, but only recently have we begun to develop a
+                   rigorous understanding of why it performs so well on
+                   difficult problems and how it is best applied in practice.
+                   Unfortunately, that understanding is confined within the
+                   mathematics of differential geometry which has limited its
+                   dissemination, especially to the applied communities for
+                   which it is particularly important. In this review I provide
+                   a comprehensive conceptual account of these theoretical
+                   foundations, focusing on developing a principled intuition
+                   behind the method and its optimal implementations rather of
+                   any exhaustive rigor. Whether a practitioner or a
+                   statistician, the dedicated reader will acquire a solid
+                   grasp of how Hamiltonian Monte Carlo works, when it
+                   succeeds, and, perhaps most importantly, when it fails.",
+  month         =  jan,
+  year          =  2017,
+  archivePrefix = "arXiv",
+  primaryClass  = "stat.ME",
+  eprint        = "1701.02434"
+}
+
+
+@ARTICLE{Hoffman2014-fl,
+  title     = "The {No-U-Turn} sampler: adaptively setting path lengths in
+               {H}amiltonian {M}onte {C}arlo",
+  author    = "Hoffman, Matthew D and Gelman, Andrew",
+  abstract  = "Abstract Hamiltonian Monte Carlo (HMC) is a Markov chain Monte
+               Carlo (MCMC) algorithm that avoids the random walk behavior and
+               sensitivity to correlated parameters that plague many MCMC
+               methods by taking a series of steps informed by first-order
+               gradient …",
+  journal   = "J. Mach. Learn. Res.",
+  publisher = "jmlr.org",
+  volume    =  15,
+  number    =  1,
+  pages     = "1593--1623",
+  year      =  2014
+}
