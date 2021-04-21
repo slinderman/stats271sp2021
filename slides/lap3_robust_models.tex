@@ -31,8 +31,9 @@
 \begin{frame}{Lap 3: Robust regress models and Intro to MCMC}
 \begin{itemize}
     \item \hyperref[sec:robust_regression]{\textbf{Model:} Robust regression models}
-    \item \textbf{Algorithm:} Markov chain Monte Carlo (specifically, HMC)
-    \item \textbf{Criticism:} MCMC Diagnostics
+    \item \hyperref[sec:intro_mcmc]{\textbf{Algorithm:} Intro to Markov chain Monte Carlo (MCMC)}
+    \item \hyperref[sec:diagnostics]{\textbf{Criticism:} MCMC Diagnostics}
+    \item \hyperref[sec:hmc]{\textbf{Algorithm II:} Hamiltonian Monte Carlo}
 \end{itemize}
 \end{frame}
 
@@ -196,6 +197,16 @@ The MAP estimate of the parameters yields a much better estimate of the weights 
 
 \section{Algorithm: Intro to MCMC}
 \label{sec:intro_mcmc}
+
+\begin{frame}{Lap 3: Robust regress models and Intro to MCMC}
+\begin{itemize}
+    \item \hyperref[sec:robust_regression]{Model: Robust regression models}
+    \item \hyperref[sec:intro_mcmc]{\textbf{Algorithm: Intro to Markov chain Monte Carlo (MCMC)}}
+    \item \hyperref[sec:diagnostics]{Criticism: MCMC Diagnostics}
+    \item \hyperref[sec:hmc]{Algorithm II: Hamiltonian Monte Carlo}
+\end{itemize}
+\end{frame}
+
 
 \begin{frame}{Notation}
 \begin{itemize}
@@ -467,13 +478,30 @@ We can succinctly capture both cases with,
 
 % MH example, trace plots
 \begin{frame}{Metropolis-Hastings Trace Plot}
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/lap3/mh_traces.pdf}
+
+Proposal distribution: $q(\mbtheta \mid \mbtheta') = \cN(\mbtheta \mid \mbtheta', 0.1 \mbI)$; Initial distribution: $\pi_1(\mbtheta) = \delta_{\mbzero}(\mbtheta)$. Red lines show the MAP estimate; black lines show samples.
+    
+    \begin{center}
+    \includegraphics[width=0.6\textwidth]{figures/lap3/mh_traces.pdf}
+    \end{center}
+    
 \end{frame}
 
 \begin{frame}{Metropolis-Hastings Density Approximation}
     \centering
     \includegraphics[width=0.6\textwidth]{figures/lap3/mh_nu_tausq_density.pdf}
+\end{frame}
+
+\section{MCMC Diagnostics}
+\label{sec:diagnostics}
+
+\begin{frame}{Lap 3: Robust regress models and Intro to MCMC}
+\begin{itemize}
+    \item \hyperref[sec:robust_regression]{Model: Robust regression models}
+    \item \hyperref[sec:intro_mcmc]{Algorithm: Intro to Markov chain Monte Carlo (MCMC)}
+    \item \hyperref[sec:diagnostics]{\textbf{Criticism: MCMC Diagnostics}}
+    \item \hyperref[sec:hmc]{Algorithm II: Hamiltonian Monte Carlo}
+\end{itemize}
 \end{frame}
 
 \begin{frame}{Autocovariance and autocorrelation}
@@ -514,9 +542,9 @@ In practice, there are already good implementations in Python (c.f. \href{https:
 
 \begin{frame}{Autocorrelation of the MH trace above}
     We used \href{https://www.tensorflow.org/probability/api_docs/python/tfp/stats/auto_correlation}{\texttt{tfp.stats.auto\_correlation}} to compute the autocorrelation function for the traces above,
-    
-    {\centering \includegraphics[width=0.6\textwidth]{figures/lap3/mh_autocorr.pdf}}
-    
+    \begin{center}
+         \includegraphics[width=0.6\textwidth]{figures/lap3/mh_autocorr.pdf}
+    \end{center}
     Effective sample sizes (per 100,000 samples): 5629, 7235,  257, and 364.
 \end{frame}
 
@@ -582,6 +610,15 @@ Fortunately, the bias decays as $O(S^{-1})$ whereas the variance decays as $O(S^
 \section{Algorithm II: Hamiltonian Monte Carlo}
 \label{sec:hmc}
 
+\begin{frame}{Lap 3: Robust regress models and Intro to MCMC}
+\begin{itemize}
+    \item \hyperref[sec:robust_regression]{Model: Robust regression models}
+    \item \hyperref[sec:intro_mcmc]{Algorithm: Intro to Markov chain Monte Carlo (MCMC)}
+    \item \hyperref[sec:diagnostics]{Criticism: MCMC Diagnostics}
+    \item \hyperref[sec:hmc]{\textbf{Algorithm II: Hamiltonian Monte Carlo}}
+\end{itemize}
+\end{frame}
+
 \begin{frame}{How can we make smarter proposals?}
     Metropolis-Hastings with a symmetric Gaussian proposal behaves like a random walk.
     
@@ -629,7 +666,7 @@ But why stop at one gradient step?
     
 \textbf{Reference:} \citet{Neal2012-ev} \textit{{MCMC} using Hamiltonian dynamics}.
 
-\textbf{Idea: } \textit{Think of negative log probability as an \textit{energy landscape}. Now imagine a puck sliding around on this bumpy surface. Give it random kicks; it will tend to slide downhill toward points of low potential energy (high probability). Each kick can displace the puck by a large amountDone properly, the puck will visit points with probability proportional to the posterior probability. }
+\textbf{Idea: } \textit{Think of negative log probability as an \textit{energy landscape}. Now imagine a puck sliding around on this bumpy surface. Give it random kicks; it will tend to slide downhill toward points of low potential energy (high probability). Each kick can displace the puck by a large amount. Done properly, the puck will visit points with probability proportional to the posterior probability. }
     
 \end{frame}
 
@@ -676,8 +713,8 @@ But why stop at one gradient step?
     
     The partial derivatives are 
     \begin{align}
-        \frac{\partial H}{\dif p} &= p \\
-        -\frac{\partial H}{\dif q} &= -q
+        \frac{\partial H}{\partial p} &= p \\
+        -\frac{\partial H}{\partial q} &= -q
     \end{align}
     so 
     \begin{align}
