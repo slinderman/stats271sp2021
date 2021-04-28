@@ -870,6 +870,61 @@ There are many other ways to arrive at the DPMM:
 \end{frame}
 
 % Random measure perspective
+\begin{frame}{Random measure perspective}
+Another way to arrive at the DPMM is by thinking of the Bayesian mixture model as a \textbf{random measure},
+\begin{align}
+    \Theta &= \sum_{k=1}^\infty \pi_k \, \delta_{\mbeta_k}
+\end{align}
+where $\pi_k \in [0,1]$ are the weights and $\mbeta_k$ are the locations. Since the weights and locations are random variables, $\Theta$ is a random measure.
+
+In particular, it's a random measure on the space of $\mbeta$ with a countably infinite number of atoms. If the weights sum to one, its a random \textit{probability} measure.
+\end{frame}
+
+\begin{frame}{Constructing a random measure}
+The simplest way to construct a random measure is to sample the locations independently,
+\begin{align}
+    \mbeta_k &\sim p(\mbeta \mid \mbphi, \nu).
+\end{align}
+
+The weights cannot be independent if they're to sum to one. For finite mixtures, a simple alternative is to sample weights and then normalize them,
+\begin{align}
+    w_k &\sim p(w), & \pi_k &= \frac{w_k}{\sum_{j=1}^K w_j}.
+\end{align}
+When $p(w) = \distGamma(w \mid \alpha, 1)$, this yields a symmetric Dirichlet distribution on $\mbpi \in \Delta_K$.
+\end{frame}
+
+\begin{frame}{Constructing a random measure with an infinte number of atoms}
+This trick doesn't work for infinite mixtures; the sum of weights diverges almost surely.
+
+Instead, we can use a \textbf{stick breaking construction}, thinking of the interval $[0,1]$ as a unit-length ``stick.''
+
+Let $v_k$ denote the fraction of the remaining stick given to component $k$. Then sample,
+\begin{align}
+    v_k &\sim p(v_k) & \pi_k &= v_k \prod_{j=1}^{k-1} (1 - v_j).
+\end{align}
+
+When $p(v_k) = \distBeta(v_k \mid 1, \alpha)$, this yields a \textbf{Dirichlet process}. 
+
+(If we have finite $K$, setting $\pi_K = \prod_{j=1}^{K-1}$ yields a finite Dirichlet distribution on $\mbpi$.)
+
+We say $\Theta \sim \mathrm{DP}(\alpha, H)$ where $H$ is the distribution with density $p(\mbeta \mid \mbphi, \nu)$.
+
+
+\end{frame}
+
+\begin{frame}{Posterior inference in the DPMM}
+    Now we can think of the Bayesian mixture model as sampling a random $\mbeta_n \sim \Theta$ for each data point $n$. 
+    
+    Since $\Theta$ is an atomic measure, there is some probability that $\mbeta_n = \mbeta_{n'}$ for two different data points.
+    
+    Now we can run a Gibbs sampler on $\{\mbeta_n\}_{n=1}^N$, sampling their conditional probabilities according to,
+    \begin{align}
+        p(\mbeta_n \mid \{\mbeta_{n'}\}_{n' \neq n}, \{\mbx_n\}_{n=1}^N) &\propto \alpha p(\mbx_n \mid \mbeta_n) p(\mbeta_n \mid \mbphi, \nu) + \sum_{n' \neq n} p(\mbx_n \mid \mbphi_{n'}), 
+    \end{align}
+    which is an uncollapsed Gibbs sampler. 
+    
+    Alternatively, we can collapse out the $\mbphi$'s and obtain the collapsed Gibbs sampler presented above.
+\end{frame}
 
 \begin{frame}[t,allowframebreaks]
         \frametitle{References}
