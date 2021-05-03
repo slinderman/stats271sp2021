@@ -225,6 +225,7 @@ p(\{\mbeta_k\}_{k=1}^K, & \{\mbpi_n, \mbz_n, \mbx_n\}_{n=1}^N \mid \mbphi, \mbal
 \end{frame}
 
 \begin{frame}{Gibbs sampling for LDA}
+\label{slide:gibbs}
 As usual, sample each variable from its conditional distribution, holding the rest fixed.
 
 \begin{itemize}
@@ -452,20 +453,236 @@ Consider optimizing the parameters for one factor~$q(\theta_j; \lambda_j)$. As a
 \end{align}
 where 
 \begin{align}
+    \label{eq:cavi_form}
     \tilde{p}(\theta_j) &\propto
     \exp \left\{ \E_{q(\mbtheta_{\neg j}; \mblambda_{\neg j})} \left[ \log p(\theta_j \mid \mbtheta_{\neg j}, \mbx) \right] \right\}
 \end{align}
 The ELBO is maximized wrt $\lambda_j$ when this KL is minimized; i.e. when $q(\theta_j ; \lambda_j) = \tilde{p}(\theta_j)$, the exponentiated expected log conditional probability, holding all other factors fixed.
 \end{frame}
 
-\begin{frame}{Next time}
-    
+% \begin{frame}{Next time}
+%     \begin{itemize}
+%         \item Coordinate ascent variational inference for LDA
+%         \item Word count formulation
+%         \item Evaluating topic models and choosing $K$
+%         \item Stochastic variational inference
+%     \end{itemize}
+% \end{frame}
+
+\subsection{CAVI for LDA}
+\label{sec:cavi_lda}
+
+\begin{frame}{Lap 5: Mixed Membership Models and Variational Inference}
+\begin{itemize}
+    \item \hyperref[sec:models]{Model: Mixed Membership Models}
+    \item \hyperref[sec:cavi]{Algorithm: Coordinate Ascent Variational Inference (CAVI)}
     \begin{itemize}
-        \item Coordinate ascent variational inference for LDA
-        \item Word count formulation
-        \item Evaluating topic models and choosing $K$
-        \item Stochastic variational inference
+        \item \textbf{CAVI for LDA}
     \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Coordinate Ascent Variational Inference for LDA}
+
+Let's derive the CAVI updates for LDA.
+
+Assume a mean field family, and assume each factor is of the same exponential family form as the corresponding prior:
+\begin{align}
+    q(z_{n,\ell}; \mblambda^{(z)}_{n, \ell}) &= \distCategorical(z_{n, \ell}; \mblambda^{(z)}_{n, \ell}) \\
+    q(\mbpi_n; \mblambda^{(\mbpi)}_{n}) &= \distDirichlet(\mbpi_n; \mblambda^{(\mbpi)}_{n}) \\
+    q(\mbeta_k; \mblambda^{(\mbeta)}_{k}) &= \distDirichlet(\mbeta_k; \mblambda^{(\mbeta)}_{k}).
+\end{align}
+so $\mblambda^{(z)}_{n, \ell} \in \Delta_K$, $\mblambda^{(\mbpi)}_{n} \in \reals_+^K$, and $\mblambda^{(\mbeta)}_{k} \in \reals_+^V$ are the variational parameters.
+
+(It turns out, for conjugate exponential family models, the optimal variational factors are of the same form as the prior anyway!)
+\end{frame}
+
+\begin{frame}{CAVI updates for the topic assignments}
+Recall that the optimal CAVI updates are of the form in Eq.~\ref{eq:cavi_form}. 
+
+We already derived the conditional distributions for Gibbs sampling (Slide~\ref{slide:gibbs}).
+
+For the topic assignments, the CAVI update is,
+\begin{align}
+    \log q(z_{n, \ell} = k; \mblambda^{(z)}_{n, \ell}) &=
+    \E_{q(\mbpi_n) q(\mbeta_k)} \left[ \log \pi_{n, k} + \log p(x_{n, \ell} \mid \eta_{k}) \right] + c \\
+    &= \E_{q(\mbpi_n)} \left[ \log \pi_{n, k} \right] + \E_{q(\mbeta_k)} \left[ \log \eta_{k, x_{n, \ell}} \right] + c \\
+    &= \log \distCategorical(z_{n, \ell} = k; \mblambda^{(z)}_{n, \ell}) \\
+    \Rightarrow \log \lambda_{n,\ell,k}^{(z)} &= \E_{q(\mbpi_n)} \left[ \log \pi_{n, k} \right] + \E_{q(\mbeta_k)} \left[ \log \eta_{k, x_{n, \ell}} \right] + c
+\end{align}
+Since $\mblambda_{n,\ell}^{(z)}$ must sum to one,
+\begin{align}
+\label{eq:q_z_update}
+\lambda_{n,\ell,k}^{(z)} &= \frac{\exp\left\{\E_{q(\mbpi_n)} \left[ \log \pi_{n, k} \right] + \E_{q(\mbeta_k)} \left[ \log \eta_{k, x_{n, \ell}} \right]\right\}}{\sum_{j=1}^K \exp\left\{\E_{q(\mbpi_n)} \left[ \log \pi_{n, j} \right] + \E_{q(\mbeta_j)} \left[ \log \eta_{j, x_{n, \ell}} \right]\right\} }
+\end{align}
+\end{frame}
+
+\begin{frame}{Expectations under Dirichlet distributions}
+The variational factors for $\mbpi_n$ and $\mbeta_k$ are Dirichlet distributions. 
+
+The necessary expectations have closed form expressions:
+\begin{align}
+    \E_{\distDirichlet(\mbpi; \mbalpha)}[\log \pi_k] = \psi(\alpha_k) - \psi \Big(\sum_{j=1}^K \alpha_j \Big)
+\end{align}
+where $\psi(\cdot)$ is the \emph{digamma function}, the logarithmic derivative of the gamma function.
+\end{frame}
+
+\begin{frame}{CAVI updates for the topic proportions}
+Referring back to Slide~\ref{slide:gibbs}, we see the CAVI update is,
+\begin{align}
+    \log q(\mbpi_{n}; \mblambda^{(\mbpi)}_{n}) &=
+    \E_{q(\mbz_n)} \left[ \log \distDirichlet(\mbpi_n; \mbalpha) + \sum_{k=1}^K N_{n,k} \log \pi_{n,k} \right] + c \\
+    &= \sum_{k=1}^K (\alpha_k - 1 + \E_{q(\mbz_n)}[N_{n,k}]) \log \pi_{n,k} \\
+    &= \log \distDirichlet\Big(\mbpi_n; \mblambda_n^{(\mbpi)} \Big) \\
+    \Rightarrow \mblambda^{(\mbpi)}_n &= \Big[\alpha_1 + \E_{q(\mbz_n)}[N_{n,1}], \ldots, \alpha_1 + \E_{q(\mbz_n)}[N_{n,K}] \Big],
+\end{align}
+where
+\begin{align}
+    \E_{q(\mbz_n)}[N_{n,k}] 
+    &= \sum_{\ell=1}^L \E_{q(z_{n,\ell})}[\bbI[z_{n,\ell}=k]]
+    = \sum_{\ell=1}^L \lambda_{n,\ell,k}^{(z)}.
+\end{align}
+\end{frame}
+
+\begin{frame}{CAVI updates for the topic parameters}
+The topic parameter updates are similar
+\begin{align}
+    \log q(\mbeta_k; \mblambda^{(\mbeta)}_k) &=
+    \E_{q(\mbz)} \left[ \log \distDirichlet(\mbeta_k; \mbphi) + \sum_{v=1}^V N_{k,v} \log \eta_{k,v} \right] + c \\
+    &= \sum_{v=1}^V (\phi_v - 1 + \E_{q(\mbz)}[N_{k,v}]) \log \eta_{k,v} \\
+    &= \log \distDirichlet\Big(\mbeta_k; \mblambda^{(\mbeta)}_k \Big) \\
+    \Rightarrow \mblambda^{(\mbeta)}_k &= \Big[\phi_1 + \E_{q(\mbz)}[N_{k,1}], \ldots, \phi_1 + \E_{q(\mbz)}[N_{k,V}] \Big],
+\end{align}
+where
+\begin{align}
+    \E_{q(\mbz)}[N_{k,v}] 
+    &= \sum_{n=1}^N \sum_{\ell=1}^L \E_{q(z_{n,\ell})}[\bbI[z_{n,\ell}=k]]
+    = \sum_{n=1}^N \sum_{\ell=1}^L \lambda_{n,\ell,k}^{(z)}.
+\end{align}
+\end{frame}
+
+\begin{frame}{Calculating the ELBO}
+Dropping hyperparameters and variational parameters, the ELBO is,
+\begin{align}
+    \cL(\mblambda) &= \E_{q}[\log p(\{\mbx_n, \mbz_n, \mbpi_n\}_{n=1}^N, \{\mbeta_k\}_{k=1}^K)] - \E_q[\log q(\{\mbz_n, \mbpi_n\}_{n=1}^N, \{\mbeta_k\}_{k=1}^K)] 
+\end{align}
+Thanks to the factorization of the joint distribution and the variational posterior, this simplifies,
+\begin{multline}
+    \cL(\mblambda) = \sum_{n=1}^N \E_{q}[\log p(\mbpi_n)] + \sum_{k=1}^K \E_q[\log p(\mbeta_k)] \\
+    + \sum_{n=1}^N \sum_{\ell=1}^L \E_q[\log p(z_{n,\ell} \mid \mbpi_n)] + \E_q[\log p(x_{n, \ell} \mid z_{n,\ell}, \mbeta)] \\
+    -\sum_{k=1}^K \E_q[\log q(\mbeta_k)] - \sum_{n=1}^N \E_q[\log q(\mbpi_n)]
+    -\sum_{n=1}^N \sum_{\ell=1}^L \E_q[\log q(z_{n, \ell})]
+\end{multline}
+The first two terms are Dirichlet cross entropies and the last three terms are entropies. Tensorflow probability has already implemented these functions for you, so this is easier to calculate than you might think!
+\end{frame}
+
+\begin{frame}{Calculating the ELBO II}
+The middle terms are,
+\begin{align}
+    \E_q[\log p(z_{n,\ell} \mid \mbpi_n)] 
+    &= \sum_{k=1}^K \E_{q(z_{n,\ell})}[\bbI[z_{n,\ell}=k]] \cdot \E_{q(\mbpi_n)} [\log \pi_{n,k}] \\
+    &= \sum_{k=1}^K \lambda_{n,\ell,k}^{(z)} \cdot \E_{q(\mbpi_n)} [\log \pi_{n,k}]
+\end{align}
+and
+\begin{align}
+    \E_q[\log p(x_{n, \ell} \mid z_{n,\ell}, \mbeta)] 
+    &= \sum_{k=1}^K \E_{q(z_{n,\ell})}[\bbI[z_{n,\ell}=k]] \cdot \E_{q(\mbeta_k)} [\log \eta_{k,x_{n,\ell}}] \\
+    &= \sum_{k=1}^K \lambda_{n,\ell,k}^{(z)} \cdot \E_{q(\mbeta_k)} [\log \eta_{k,x_{n,\ell}}] 
+\end{align}
+Again, these involve only simple expectations of Dirichlet distributions.
+\end{frame}
+
+\begin{frame}{Bag of word counts representation and exchangeability}
+
+LDA models the words as \textbf{exchangeable} random variables. That is, the joint distribution is invariant to permutations:
+\begin{align}
+    p(\mbx_n) = p(x_{n,1}, \ldots, x_{n,L}) \equiv
+    p(x_{n,\sigma(1)}, \ldots, p(x_{n,\sigma(L)})) 
+\end{align}
+where $\sigma(\cdot)$ is any permutation of the indices $\{1,\ldots,L\}$.
+
+In text modeling, this is called the \textbf{bag of words} assumption.
+
+\textbf{De Finetti's theorem} says that any joint distribution over exchangeable random variables can be represented as a marginal of \textit{some} latent variable model of the form,
+\begin{align}
+    p(\mbx_n) &= \int p(\theta) \prod_{\ell=1}^L p(x_{n,\ell} \mid \theta) \dif \theta.
+\end{align}
+This is one justification for the \textbf{conditional independence assumptions} we often make in Bayesian models.
+
+
+\end{frame}
+
+\begin{frame}{CAVI updates in the bag-of-words representation}
+
+We can use the exchangeability assumption to work with word counts rather than word indicators. 
+
+Note that $\lambda_{n,\ell,k}^{(z)} = \lambda_{n,\ell',k}^{(z)}$ if $x_{n,\ell} = x_{n,\ell'}$. Instead of having parameters for each word instance~$\ell$, zhave one for each term~$v$ in the vocabulary,
+\begin{align}
+\lambda_{n,v,k}^{(z)} &= \frac{\exp\left\{\E_{q(\mbpi_n)} \left[ \log \pi_{n, k} \right] + \E_{q(\mbeta_k)} \left[ \log \eta_{k, v} \right]\right\}}{\sum_{j=1}^K \exp\left\{\E_{q(\mbpi_n)} \left[ \log \pi_{n, j} \right] + \E_{q(\mbeta_j)} \left[ \log \eta_{j, v} \right]\right\} }
+\end{align}
+
+Then let $y_{n,v} = \sum_{\ell=1}^L \bbI[x_{n,\ell}=v]$ denote the number of instances of word $v$ in document $n$.
+
+From these variational parameters, it's easy to compute the expected summary counts,
+\begin{align}
+    \E_{q}[N_{n,k}] &= \sum_{v=1}^V y_{n,v} \lambda^{(z)}_{n,v,k} 
+    &
+    \E_{q}[N_{k,v}] &= \sum_{n=1}^N y_{n,v} \lambda^{(z)}_{n,v,k} 
+\end{align}
+\end{frame}
+
+\begin{frame}{Scaling up to very large datasets}
+
+There are a few tricks to make LDA much more scalable. 
+
+First, to save memory, you only need to track, $\mblambda_{n,v}^{(z)} = [\lambda_{n,v,1}^{(z)}, \ldots, \lambda_{n,v,K}^{(z)}]$ if $y_{n,v} > 0$. 
+
+Likewise, you can process documents in rolling fashion, discarding $\mblambda_{n,v}^{(z)}$ once you've updated $\E_q[N_{k,v}]$ and $\mblambda_n^{(\mbpi)}$. 
+
+Finally, you can use \textbf{stochastic variational inference} \citep{hoffman2013stochastic} to work with mini-batches of documents to get Monte Carlo estimates of $\E_q[N_{k,v}]$. 
+
+SVI can be seen as \textbf{stochastic gradient ascent} on the ELBO using \textbf{natural gradients} \citet{amari1998natural}; i.e., gradient descent preconditioned with the Fisher information matrix.
+
+    
+\end{frame}
+
+\begin{frame}{Evaluating topic models}
+    
+The key hyperparameter is $K$, the number of topics. By now, we've seen a few different ways of setting these ``complexity knobs.'' 
+
+\textbf{Question: } what approaches could we take?
+
+Blei recommends another method that differs slightly from what we've seen thus far. He suggests evaluating,
+\begin{align}
+    p(\mbx_{n'}^{\mathsf{out}} \mid \mbx_{n'}^{\mathsf{in}}, \{\mbx_n\}_{n=1}^N) 
+    &= \int p(\mbx_{n'}^{\mathsf{out}} \mid \mbpi_{n'}, \{\mbeta_k\}_{k=1}^K) \, p(\mbpi_{n'} \mid \mbx_{n'}^{\mathsf{in}}, \{\mbeta_k\}_{k=1}^K) \, p(\{\mbeta_k\}_{k=1}^K \mid \{\mbx_n\}_{n=1}^N) \dif \mbpi_{n'}
+\end{align}
+where 
+\begin{itemize}
+    \item $\mbx_{n'}^{\mathsf{out}}$ consists of a subset of words in a held-out document $n'$
+    \item $\mbx_{n'}^{\mathsf{in}}$ are the remaining words in that document, which are used to estimate the topic proportions, and
+    \item $\{\mbx_n\}_{n=1}^N$ are the training documents used to estimate the topics $\{\mbeta_k\}_{k=1}^K$.
+\end{itemize}
+\citet{wallach2009evaluation} discuss topic model evaluation in detail.
+\end{frame}
+
+\begin{frame}[t]{Evaluating topic models II}
+\textbf{Question: } why not simply compare the ELBO for different values of $K$? It's related to the marginal likelihood, after all. 
+\end{frame}
+
+
+\begin{frame}{Other mixed membership models}
+\begin{itemize}
+    \item LDA evolved from a long line of work on topic modeling. Deerweester et al [1990] proposed \textbf{latent semantic analysis} and Hofman et al [1999] proposed a probabilistic version called the \textbf{aspect model}.
+    
+    \item Pritchard et al [2000] developed MM models in \textbf{population genetics}.
+    
+    \item Erosheva et al [2007] used MM models for \textbf{survey data}.
+    
+    \item Airoldi et al [2008] developed MM models for \textbf{community detection in networks}. \citet{Gopalan2013-pz} developed a stochastic variational inference algorithm for this model.
+    
+    \item \citet{Gopalan2013-bc} proposed \textbf{Poisson matrix factorization}, which is closely related to LDA. 
+\end{itemize}
 \end{frame}
 
 \begin{frame}[t,allowframebreaks]

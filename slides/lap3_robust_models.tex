@@ -799,7 +799,7 @@ Simple Euler integration does not preserve volume: trajectories eventually diver
 Instead, alternate updates of $p$ and $q$
 \begin{align}
     p_d(t+\tfrac{\epsilon}{2}) &= p_d(t) - \frac{\epsilon}{2} \frac{\partial U}{\partial q_d} \Big|_{\mbq(t)} \\
-    q_d(t+\epsilon) &= q_d(t) + \epsilon \frac{p_d(t+\tfrac{\epsion}{2})}{m_d} \\
+    q_d(t+\epsilon) &= q_d(t) + \epsilon \frac{p_d(t+\tfrac{\epsilon}{2})}{m_d} \\
     p_d(t+\epsilon) &= p_d(t + \tfrac{\epsilon}{2}) - \frac{\epsilon}{2} \frac{\partial U}{\partial q_d} \Big|_{\mbq(t + \epsilon)} \\
 \end{align}
 Each update is a \textit{shear transformation} in which only some variables change, by amounts that depend on the other, fixed variables. The determinant of such a transformation is one, so it preserves volume.
