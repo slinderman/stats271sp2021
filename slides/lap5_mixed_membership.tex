@@ -534,7 +534,7 @@ Referring back to Slide~\ref{slide:gibbs}, we see the CAVI update is,
     \E_{q(\mbz_n)} \left[ \log \distDirichlet(\mbpi_n; \mbalpha) + \sum_{k=1}^K N_{n,k} \log \pi_{n,k} \right] + c \\
     &= \sum_{k=1}^K (\alpha_k - 1 + \E_{q(\mbz_n)}[N_{n,k}]) \log \pi_{n,k} \\
     &= \log \distDirichlet\Big(\mbpi_n; \mblambda_n^{(\mbpi)} \Big) \\
-    \Rightarrow \mblambda^{(\mbpi)}_n &= \Big[\alpha_1 + \E_{q(\mbz_n)}[N_{n,1}], \ldots, \alpha_1 + \E_{q(\mbz_n)}[N_{n,K}] \Big],
+    \Rightarrow \mblambda^{(\mbpi)}_n &= \Big[\alpha_1 + \E_{q(\mbz_n)}[N_{n,1}], \ldots, \alpha_K + \E_{q(\mbz_n)}[N_{n,K}] \Big],
 \end{align}
 where
 \begin{align}
@@ -551,13 +551,13 @@ The topic parameter updates are similar
     \E_{q(\mbz)} \left[ \log \distDirichlet(\mbeta_k; \mbphi) + \sum_{v=1}^V N_{k,v} \log \eta_{k,v} \right] + c \\
     &= \sum_{v=1}^V (\phi_v - 1 + \E_{q(\mbz)}[N_{k,v}]) \log \eta_{k,v} \\
     &= \log \distDirichlet\Big(\mbeta_k; \mblambda^{(\mbeta)}_k \Big) \\
-    \Rightarrow \mblambda^{(\mbeta)}_k &= \Big[\phi_1 + \E_{q(\mbz)}[N_{k,1}], \ldots, \phi_1 + \E_{q(\mbz)}[N_{k,V}] \Big],
+    \Rightarrow \mblambda^{(\mbeta)}_k &= \Big[\phi_1 + \E_{q(\mbz)}[N_{k,1}], \ldots, \phi_V + \E_{q(\mbz)}[N_{k,V}] \Big],
 \end{align}
 where
 \begin{align}
     \E_{q(\mbz)}[N_{k,v}] 
-    &= \sum_{n=1}^N \sum_{\ell=1}^L \E_{q(z_{n,\ell})}[\bbI[z_{n,\ell}=k]]
-    = \sum_{n=1}^N \sum_{\ell=1}^L \lambda_{n,\ell,k}^{(z)}.
+    &= \sum_{n=1}^N \sum_{\ell=1}^L \E_{q(z_{n,\ell})}[\bbI[z_{n,\ell}=k]] \bbI[x_{n, \ell} = v]
+    = \sum_{n=1}^N \sum_{\ell=1}^L \lambda_{n,\ell,k}^{(z)} \bbI[x_{n, \ell} = v].
 \end{align}
 \end{frame}
 
