@@ -1,0 +1,900 @@
+
+@ARTICLE{Neal2012-ev,
+  title         = "{MCMC} using {H}amiltonian dynamics",
+  author        = "Neal, Radford M",
+  abstract      = "Hamiltonian dynamics can be used to produce distant
+                   proposals for the Metropolis algorithm, thereby avoiding the
+                   slow exploration of the state space that results from the
+                   diffusive behaviour of simple random-walk proposals. Though
+                   originating in physics, Hamiltonian dynamics can be applied
+                   to most problems with continuous state spaces by simply
+                   introducing fictitious ``momentum'' variables. A key to its
+                   usefulness is that Hamiltonian dynamics preserves volume,
+                   and its trajectories can thus be used to define complex
+                   mappings without the need to account for a hard-to-compute
+                   Jacobian factor - a property that can be exactly maintained
+                   even when the dynamics is approximated by discretizing time.
+                   In this review, I discuss theoretical and practical aspects
+                   of Hamiltonian Monte Carlo, and present some of its
+                   variations, including using windows of states for deciding
+                   on acceptance or rejection, computing trajectories using
+                   fast approximations, tempering during the course of a
+                   trajectory to handle isolated modes, and short-cut methods
+                   that prevent useless trajectories from taking much
+                   computation time.",
+  month         =  jun,
+  year          =  2012,
+  archivePrefix = "arXiv",
+  primaryClass  = "stat.CO",
+  eprint        = "1206.1901"
+}
+
+
+@ARTICLE{Andrieu2008-yc,
+  title    = "A tutorial on adaptive {MCMC}",
+  author   = "Andrieu, Christophe and Thoms, Johannes",
+  abstract = "We review adaptive Markov chain Monte Carlo algorithms (MCMC) as
+              a mean to optimise their performance. Using simple toy examples
+              we review their theoretical underpinnings, and in particular show
+              why adaptive MCMC algorithms might fail when some fundamental
+              properties are not satisfied. This leads to guidelines concerning
+              the design of correct algorithms. We then review criteria and the
+              useful framework of stochastic approximation, which allows one to
+              systematically optimise generally used criteria, but also analyse
+              the properties of adaptive MCMC algorithms. We then propose a
+              series of novel adaptive algorithms which prove to be robust and
+              reliable in practice. These algorithms are applied to artificial
+              and high dimensional scenarios, but also to the classic mine
+              disaster dataset inference problem.",
+  journal  = "Stat. Comput.",
+  volume   =  18,
+  number   =  4,
+  pages    = "343--373",
+  month    =  dec,
+  year     =  2008
+}
+
+
+@ARTICLE{Betancourt2017-ml,
+  title         = "A Conceptual Introduction to {H}amiltonian {M}onte {C}arlo",
+  author        = "Betancourt, Michael",
+  abstract      = "Hamiltonian Monte Carlo has proven a remarkable empirical
+                   success, but only recently have we begun to develop a
+                   rigorous understanding of why it performs so well on
+                   difficult problems and how it is best applied in practice.
+                   Unfortunately, that understanding is confined within the
+                   mathematics of differential geometry which has limited its
+                   dissemination, especially to the applied communities for
+                   which it is particularly important. In this review I provide
+                   a comprehensive conceptual account of these theoretical
+                   foundations, focusing on developing a principled intuition
+                   behind the method and its optimal implementations rather of
+                   any exhaustive rigor. Whether a practitioner or a
+                   statistician, the dedicated reader will acquire a solid
+                   grasp of how Hamiltonian Monte Carlo works, when it
+                   succeeds, and, perhaps most importantly, when it fails.",
+  month         =  jan,
+  year          =  2017,
+  archivePrefix = "arXiv",
+  primaryClass  = "stat.ME",
+  eprint        = "1701.02434"
+}
+
+
+@ARTICLE{Hoffman2014-fl,
+  title     = "The {No-U-Turn} sampler: adaptively setting path lengths in
+               {H}amiltonian {M}onte {C}arlo",
+  author    = "Hoffman, Matthew D and Gelman, Andrew",
+  abstract  = "Abstract Hamiltonian Monte Carlo (HMC) is a Markov chain Monte
+               Carlo (MCMC) algorithm that avoids the random walk behavior and
+               sensitivity to correlated parameters that plague many MCMC
+               methods by taking a series of steps informed by first-order
+               gradient …",
+  journal   = "J. Mach. Learn. Res.",
+  publisher = "jmlr.org",
+  volume    =  15,
+  number    =  1,
+  pages     = "1593--1623",
+  year      =  2014
+}
+
+
+@ARTICLE{Kiselev2019-bt,
+  title    = "Challenges in unsupervised clustering of single-cell {RNA-seq}
+              data",
+  author   = "Kiselev, Vladimir Yu and Andrews, Tallulah S and Hemberg, Martin",
+  abstract = "Single-cell RNA sequencing (scRNA-seq) allows researchers to
+              collect large catalogues detailing the transcriptomes of
+              individual cells. Unsupervised clustering is of central
+              importance for the analysis of these data, as it is used to
+              identify putative cell types. However, there are many challenges
+              involved. We discuss why clustering is a challenging problem from
+              a computational point of view and what aspects of the data make
+              it challenging. We also consider the difficulties related to the
+              biological interpretation and annotation of the identified
+              clusters.",
+  journal  = "Nat. Rev. Genet.",
+  volume   =  20,
+  number   =  5,
+  pages    = "273--282",
+  month    =  may,
+  year     =  2019,
+  language = "en"
+}
+
+@article{orbanz2012lecture,
+  title={Lecture notes on {B}ayesian nonparametrics},
+  author={Orbanz, Peter},
+  month={May},
+  year={2014},
+  url={http://www.gatsby.ucl.ac.uk/~porbanz/papers/porbanz_BNP_draft.pdf}
+}
+
+@article{blei2003latent,
+  title={Latent {D}irichlet allocation},
+  author={Blei, David M and Ng, Andrew Y and Jordan, Michael I},
+  journal={Journal of Machine Learning Research},
+  volume={3},
+  pages={993--1022},
+  year={2003},
+  publisher={JMLR. org}
+}
+
+
+@ARTICLE{Blei2017-yc,
+  title     = "Variational Inference: A Review for Statisticians",
+  author    = "Blei, David M and Kucukelbir, Alp and McAuliffe, Jon D",
+  journal   = "Journal of the American Statistical Association",
+  publisher = "Taylor \& Francis",
+  volume    =  112,
+  number    =  518,
+  pages     = "859--877",
+  month     =  apr,
+  year      =  2017
+}
+
+
+% The entry below contains non-ASCII chars that could not be converted
+% to a LaTeX equivalent.
+@ARTICLE{Boyd-Graber2017-qk,
+  title     = "Applications of topic models",
+  author    = "Boyd-Graber, Jordan and Hu, Yuening and Mimno, David",
+  abstract  = "How can a single person understand what's going on in a
+               collection of millions of documents? This is an increasingly
+               common problem: sifting through an organization's e- mails,
+               understanding a decade worth of newspapers, or characterizing a
+               scientific field's …",
+  journal   = "Found. Trends\textregistered{} Inf. Retr.",
+  publisher = "Now Publishers",
+  volume    =  11,
+  number    = "2-3",
+  pages     = "143--296",
+  year      =  2017,
+  language  = "en"
+}
+
+@article{blei2012probabilistic,
+  title={Probabilistic topic models},
+  author={Blei, David M},
+  journal={Communications of the ACM},
+  volume={55},
+  number={4},
+  pages={77--84},
+  year={2012},
+  publisher={ACM New York, NY, USA}
+}
+
+@inproceedings{blei2006dynamic,
+  title={Dynamic topic models},
+  author={Blei, David M and Lafferty, John D},
+  booktitle={Proceedings of the 23rd international conference on Machine learning},
+  pages={113--120},
+  year={2006}
+}
+
+@inproceedings{wallach2009evaluation,
+  title={Evaluation methods for topic models},
+  author={Wallach, Hanna M and Murray, Iain and Salakhutdinov, Ruslan and Mimno, David},
+  booktitle={Proceedings of the 26th Annual International Conference on Machine Learning},
+  pages={1105--1112},
+  year={2009}
+}
+
+
+@ARTICLE{Gopalan2013-bc,
+  title         = "Scalable Recommendation with {P}oisson Factorization",
+  author        = "Gopalan, Prem and Hofman, Jake M and Blei, David M",
+  month         =  nov,
+  year          =  2013,
+  archivePrefix = "arXiv",
+  primaryClass  = "cs.IR",
+  eprint        = "1311.1704"
+}
+
+
+@ARTICLE{Gopalan2013-pz,
+  title    = "Efficient discovery of overlapping communities in massive
+              networks",
+  author   = "Gopalan, Prem K and Blei, David M",
+  journal  = "Proc. Natl. Acad. Sci. U. S. A.",
+  volume   =  110,
+  number   =  36,
+  pages    = "14534--14539",
+  month    =  sep,
+  year     =  2013,
+  keywords = "Bayesian statistics; massive data; network analysis",
+  language = "en"
+}
+
+@article{hoffman2013stochastic,
+  title={Stochastic variational inference.},
+  author={Hoffman, Matthew D and Blei, David M and Wang, Chong and Paisley, John},
+  journal={Journal of Machine Learning Research},
+  volume={14},
+  number={5},
+  year={2013}
+}
+
+@article{amari1998natural,
+  title={Natural gradient works efficiently in learning},
+  author={Amari, Shun-Ichi},
+  journal={Neural computation},
+  volume={10},
+  number={2},
+  pages={251--276},
+  year={1998},
+  publisher={MIT Press}
+}
+
+
+@ARTICLE{Erosheva2007-vd,
+  title     = "DESCRIBING DISABILITY THROUGH INDIVIDUAL-LEVEL MIXTURE
+               MODELS For MULTIVARIATE BINARY DATA",
+  author    = "Erosheva, Elena A and Fienberg, Stephen E and Joutard, Cyrille",
+  abstract  = "Data on functional disability are of widespread policy interest
+               in the United States, especially with respect to planning for
+               Medicare and Social Security for a growing population of elderly
+               adults. We consider an extract of functional disability data
+               from the National Long Term Care Survey (NLTCS) and attempt to
+               develop disability profiles using variations of the Grade of
+               Membership (GoM) model. We first describe GoM as an
+               individual-level mixture model that allows individuals to have
+               partial membership in several mixture components simultaneously.
+               We then prove the equivalence between individual-level and
+               population-level mixture models, and use this property to
+               develop a Markov Chain Monte Carlo algorithm for Bayesian
+               estimation of the model. We use our approach to analyze
+               functional disability data from the NLTCS.",
+  journal   = "Ann. Appl. Stat.",
+  publisher = "ncbi.nlm.nih.gov",
+  volume    =  1,
+  number    =  2,
+  pages     = "346--384",
+  year      =  2007,
+  language  = "en"
+}
+
+% The entry below contains non-ASCII chars that could not be converted
+% to a LaTeX equivalent.
+@ARTICLE{Hofmann1999-de,
+  title     = "Probabilistic latent semantic indexing",
+  author    = "Hofmann, T",
+  abstract  = "Abstract Probabilistic Latent Semantic Indexing is a novel
+               approach to automated document indexing which is based on a
+               statistical latent class model for factor analysis of count
+               data. Fitted from a training corpus of text documents by a
+               generalization of the Expectation …",
+  journal   = "Proceedings of the 22nd annual international ACM",
+  publisher = "dl.acm.org",
+  year      =  1999
+}
+
+@ARTICLE{Deerwester1990-kp,
+  title     = "Indexing by latent semantic analysis",
+  author    = "Deerwester, Scott and Dumais, Susan T and Furnas, George W and
+               Landauer, Thomas K and Harshman, Richard",
+  abstract  = "Abstract A new method for automatic indexing and retrieval is
+               described. The approach is to take advantage of implicit
+               higher-order structure in the association of terms with
+               documents (?semantic structure?) in order to improve the
+               detection of relevant documents on the basis of terms found in
+               queries. The particular technique used is singular-value
+               decomposition, in which a large term by document matrix is
+               decomposed into a set of ca. 100 orthogonal factors from which
+               the original matrix can be approximated by linear combination.
+               Documents are represented by ca. 100 item vectors of factor
+               weights. Queries are represented as pseudo-document vectors
+               formed from weighted combinations of terms, and documents with
+               supra-threshold cosine values are returned. Initial tests find
+               this completely automatic method for retrieval to be promising.
+               ? 1990 John Wiley \& Sons, Inc.",
+  journal   = "J. Am. Soc. Inf. Sci.",
+  publisher = "Wiley",
+  volume    =  41,
+  number    =  6,
+  pages     = "391--407",
+  month     =  sep,
+  year      =  1990,
+  language  = "en"
+}
+
+
+@ARTICLE{Pritchard2000-wm,
+  title     = "Inference of population structure using multilocus genotype data",
+  author    = "Pritchard, J K and Stephens, M and Donnelly, P",
+  abstract  = "We describe a model-based clustering method for using multilocus
+               genotype data to infer population structure and assign
+               individuals to populations. We assume a model in which there are
+               K populations (where K may be unknown), each of which is
+               characterized by a set of allele frequencies at each locus.
+               Individuals in the sample are assigned (probabilistically) to
+               populations, or jointly to two or more populations if their
+               genotypes indicate that they are admixed. Our model does not
+               assume a particular mutation process, and it can be applied to
+               most of the commonly used genetic markers, provided that they
+               are not closely linked. Applications of our method include
+               demonstrating the presence of population structure, assigning
+               individuals to populations, studying hybrid zones, and
+               identifying migrants and admixed individuals. We show that the
+               method can produce highly accurate assignments using modest
+               numbers of loci-e.g. , seven microsatellite loci in an example
+               using genotype data from an endangered bird species. The
+               software used for this article is available from
+               http://www.stats.ox.ac.uk/ approximately pritch/home. html.",
+  journal   = "Genetics",
+  publisher = "academic.oup.com",
+  volume    =  155,
+  number    =  2,
+  pages     = "945--959",
+  month     =  jun,
+  year      =  2000,
+  language  = "en"
+}
+
+
+@ARTICLE{Airoldi2008-rh,
+  title    = "Mixed Membership Stochastic Blockmodels",
+  author   = "Airoldi, Edoardo M and Blei, David M and Fienberg, Stephen E and
+              Xing, Eric P",
+  abstract = "Observations consisting of measurements on relationships for
+              pairs of objects arise in many settings, such as protein
+              interaction and gene regulatory networks, collections of
+              author-recipient email, and social networks. Analyzing such data
+              with probabilisic models can be delicate because the simple
+              exchangeability assumptions underlying many boilerplate models no
+              longer hold. In this paper, we describe a latent variable model
+              of such data called the mixed membership stochastic blockmodel.
+              This model extends blockmodels for relational data to ones which
+              capture mixed membership latent relational structure, thus
+              providing an object-specific low-dimensional representation. We
+              develop a general variational inference algorithm for fast
+              approximate posterior inference. We explore applications to
+              social and protein interaction networks.",
+  journal  = "J. Mach. Learn. Res.",
+  volume   =  9,
+  pages    = "1981--2014",
+  month    =  sep,
+  year     =  2008,
+  language = "en"
+}
+
+@book{bishop2006pattern,
+  title={Pattern recognition and machine learning},
+  author={Bishop, Christopher M},
+  year={2006},
+  publisher={Springer}
+}
+
+@inproceedings{cremer2018inference,
+  title={Inference suboptimality in variational autoencoders},
+  author={Cremer, Chris and Li, Xuechen and Duvenaud, David},
+  booktitle={International Conference on Machine Learning},
+  pages={1078--1086},
+  year={2018},
+  organization={PMLR}
+}
+
+@book{williams1996gaussian,
+  title={Gaussian processes for regression},
+  author={Williams, Christopher KI and Rasmussen, Carl Edward},
+  year={1996},
+  publisher={MIT Press}
+}
+
+
+@INPROCEEDINGS{Storkey1999-wq,
+  title     = "Truncated covariance matrices and Toeplitz methods in Gaussian
+               processes",
+  booktitle = "Artificial Neural Networks, 1999. {ICANN} 99. Ninth
+               International Conference on (Conf. Publ. No. 470)",
+  author    = "Storkey, Amos J",
+  abstract  = "Gaussian processes are a limit extension of neural networks.
+               Standard Gaussian process techniques use a squared exponential
+               covariance function. Here, the use of truncated covariances is
+               proposed. Such covariances have compact support. Their use
+               speeds up matrix inversion and increases precision. Furthermore
+               they allow the use of speedy, memory efficient Toeplitz
+               inversion for high dimensional grid based Gaussian process
+               predictors",
+  publisher = "unknown",
+  volume    =  1,
+  pages     = "55--60 vol.1",
+  month     =  feb,
+  year      =  1999
+}
+
+
+@INPROCEEDINGS{Cunningham2008-zj,
+  title     = "Fast {G}aussian process methods for point process intensity
+               estimation",
+  booktitle = "Proceedings of the 25th International Conference on Machine
+               Learning",
+  author    = "Cunningham, John P and Shenoy, Krishna V and Sahani, Maneesh",
+  abstract  = "Point processes are difficult to analyze because they provide
+               only a sparse and noisy observation of the intensity function
+               driving the process. Gaussian Processes offer an attractive
+               framework within which to infer underlying intensity functions.
+               The result of this inference is a continuous function defined
+               across time that is typically more amenable to analytical
+               efforts. However, a naive implementation will become
+               computationally infeasible in any problem of reasonable size,
+               both in memory and run time requirements. We demonstrate problem
+               specific methods for a class of renewal processes that eliminate
+               the memory burden and reduce the solve time by orders of
+               magnitude.",
+  publisher = "Association for Computing Machinery",
+  pages     = "192--199",
+  month     =  jul,
+  year      =  2008,
+  address   = "New York, NY, USA",
+  location  = "Helsinki, Finland"
+}
+
+@inproceedings{duvenaud2013structure,
+  title={Structure discovery in nonparametric regression through compositional kernel search},
+  author={Duvenaud, David and Lloyd, James and Grosse, Roger and Tenenbaum, Joshua and Zoubin, Ghahramani},
+  booktitle={International Conference on Machine Learning},
+  pages={1166--1174},
+  year={2013},
+  organization={PMLR}
+}
+
+
+@ARTICLE{Neal2003-zu,
+  title     = "Slice sampling",
+  author    = "Neal, Radford M",
+  abstract  = "Markov chain sampling methods that adapt to characteristics of
+               the distribution being sampled can be constructed using the
+               principle that one can ample from a distribution by sampling
+               uniformly from the region under the plot of its density
+               function. A Markov chain that converges to this uniform
+               distribution can be constructed by alternating uniform sampling
+               in the vertical direction with uniform sampling from the
+               horizontal ``slice'' defined by the current vertical position,
+               or more generally, with some update that leaves the uniform
+               distribution over this slice invariant. Such ``slice sampling''
+               methods are easily implemented for univariate distributions, and
+               can be used to sample from a multivariate distribution by
+               updating each variable in turn. This approach is often easier to
+               implement than Gibbs sampling and more efficient than simple
+               Metropolis updates, due to the ability of slice sampling to
+               adaptively choose the magnitude of changes made. It is therefore
+               attractive for routine and automated use. Slice sampling methods
+               that update all variables simultaneously are also possible.
+               These methods can adaptively choose the magnitudes of changes
+               made to each variable, based on the local properties of the
+               density function. More ambitiously, such methods could
+               potentially adapt to the dependencies between variables by
+               constructing local quadratic approximations. Another approach is
+               to improve sampling efficiency by suppressing random walks. This
+               can be done for univariate slice sampling by ``overrelaxation,''
+               and for multivariate slice sampling by ``reflection'' from the
+               edges of the slice.",
+  journal   = "Annals of Statistics",
+  publisher = "Institute of Mathematical Statistics",
+  volume    =  31,
+  number    =  3,
+  pages     = "705--767",
+  month     =  jun,
+  year      =  2003,
+  keywords  = "65C05; 65C60; Adaptive methods; auxiliary variables; dynamical
+               methods; Gibbs sampling; Markov chain Monte Carlo; Metropolis
+               algorithm; overrelaxation;",
+  language  = "en"
+}
+
+
+@INPROCEEDINGS{Murray2010-zb,
+  title      = "Elliptical slice sampling",
+  booktitle  = "Proceedings of the Thirteenth International Conference on
+                Artificial Intelligence and Statistics",
+  author     = "Murray, Iain and Adams, Ryan and MacKay, David",
+  abstract   = "Many probabilistic models introduce strong dependencies between
+                variables using a latent multivariate Gaussian distribution or
+                a Gaussian process. We present a new Markov chain Monte Carlo
+                algorithm for performing inference in models with multivariate
+                Gaussian priors. Its key properties are: 1) it has simple,
+                generic code applicable to many models, 2) it has no free
+                parameters, 3) it works well for a variety of Gaussian process
+                based models. These properties make our method ideal for use
+                while model building, removing the need to spend time deriving
+                and tuning updates for more complex algorithms.",
+  publisher  = "jmlr.org",
+  pages      = "541--548",
+  month      =  mar,
+  year       =  2010,
+  language   = "en",
+  conference = "Proceedings of the Thirteenth International Conference on
+                Artificial Intelligence and Statistics"
+}
+
+
+@INPROCEEDINGS{Hensman2013-cf,
+  title     = "Gaussian processes for Big data",
+  booktitle = "Proceedings of the {Twenty-Ninth} Conference on Uncertainty in
+               Artificial Intelligence",
+  author    = "Hensman, James and Fusi, Nicol{\`o} and Lawrence, Neil D",
+  abstract  = "We introduce stochastic variational inference for Gaussian
+               process models. This enables the application of Gaussian process
+               (GP) models to data sets containing millions of data points. We
+               show how GPs can be variationally decomposed to depend on a set
+               of globally relevant inducing variables which factorize the
+               model in the necessary manner to perform variational inference.
+               Our approach is readily extended to models with non-Gaussian
+               likelihoods and latent variable models based around Gaussian
+               processes. We demonstrate the approach on a simple toy problem
+               and two real world data sets.",
+  publisher = "AUAI Press",
+  pages     = "282--290",
+  series    = "UAI'13",
+  month     =  aug,
+  year      =  2013,
+  address   = "Arlington, Virginia, USA",
+  location  = "Bellevue, WA"
+}
+
+
+@INPROCEEDINGS{Titsias2009-ls,
+  title     = "Variational Learning of Inducing Variables in Sparse Gaussian
+               Processes",
+  booktitle = "Proceedings of the Twelth International Conference on Artificial
+               Intelligence and Statistics",
+  author    = "Titsias, Michalis",
+  editor    = "van Dyk, David and Welling, Max",
+  abstract  = "Sparse Gaussian process methods that use inducing variables
+               require the selection of the inducing inputs and the kernel
+               hyperparameters. We introduce a variational formulation for
+               sparse approximations that jointly infers the inducing inputs
+               and the kernel hyperparameters by maximizing a lower bound of
+               the true log marginal likelihood. The key property of this
+               formulation is that the inducing inputs are defined to be
+               variational parameters which are selected by minimizing the
+               Kullback-Leibler divergence between the variational distribution
+               and the exact posterior distribution over the latent function
+               values. We apply this technique to regression and we compare it
+               with other approaches in the literature.",
+  publisher = "PMLR",
+  volume    =  5,
+  pages     = "567--574",
+  series    = "Proceedings of Machine Learning Research",
+  year      =  2009,
+  address   = "Hilton Clearwater Beach Resort, Clearwater Beach, Florida USA"
+}
+
+
+@ARTICLE{Miller2018-dv,
+  title    = "Mixture models with a prior on the number of components",
+  author   = "Miller, Jeffrey W and Harrison, Matthew T",
+  abstract = "A natural Bayesian approach for mixture models with an unknown
+              number of components is to take the usual finite mixture model
+              with symmetric Dirichlet weights, and put a prior on the number
+              of components-that is, to use a mixture of finite mixtures (MFM).
+              The most commonly-used method of inference for MFMs is reversible
+              jump Markov chain Monte Carlo, but it can be nontrivial to design
+              good reversible jump moves, especially in high-dimensional
+              spaces. Meanwhile, there are samplers for Dirichlet process
+              mixture (DPM) models that are relatively simple and are easily
+              adapted to new applications. It turns out that, in fact, many of
+              the essential properties of DPMs are also exhibited by MFMs-an
+              exchangeable partition distribution, restaurant process, random
+              measure representation, and stick-breaking representation-and
+              crucially, the MFM analogues are simple enough that they can be
+              used much like the corresponding DPM properties. Consequently,
+              many of the powerful methods developed for inference in DPMs can
+              be directly applied to MFMs as well; this simplifies the
+              implementation of MFMs and can substantially improve mixing. We
+              illustrate with real and simulated data, including
+              high-dimensional gene expression data used to discriminate cancer
+              subtypes.",
+  journal  = "J. Am. Stat. Assoc.",
+  volume   =  113,
+  number   =  521,
+  pages    = "340--356",
+  year     =  2018,
+  keywords = "Bayesian; clustering; density estimation; model selection;
+              nonparametric",
+  language = "en"
+}
+
+@book{neal1996bayesian,
+  title={Bayesian learning for neural networks},
+  author={Neal, Radford M},
+  year={1996},
+  publisher={Springer Science \& Business Media}
+}
+
+
+@ARTICLE{Jacot2018-dl,
+  title         = "Neural Tangent Kernel: Convergence and Generalization in
+                   Neural Networks",
+  author        = "Jacot, Arthur and Gabriel, Franck and Hongler, Cl{\'e}ment",
+  abstract      = "At initialization, artificial neural networks (ANNs) are
+                   equivalent to Gaussian processes in the infinite-width
+                   limit, thus connecting them to kernel methods. We prove that
+                   the evolution of an ANN during training can also be
+                   described by a kernel: during gradient descent on the
+                   parameters of an ANN, the network function $f_\theta$ (which
+                   maps input vectors to output vectors) follows the kernel
+                   gradient of the functional cost (which is convex, in
+                   contrast to the parameter cost) w.r.t. a new kernel: the
+                   Neural Tangent Kernel (NTK). This kernel is central to
+                   describe the generalization features of ANNs. While the NTK
+                   is random at initialization and varies during training, in
+                   the infinite-width limit it converges to an explicit
+                   limiting kernel and it stays constant during training. This
+                   makes it possible to study the training of ANNs in function
+                   space instead of parameter space. Convergence of the
+                   training can then be related to the positive-definiteness of
+                   the limiting NTK. We prove the positive-definiteness of the
+                   limiting NTK when the data is supported on the sphere and
+                   the non-linearity is non-polynomial. We then focus on the
+                   setting of least-squares regression and show that in the
+                   infinite-width limit, the network function $f_\theta$
+                   follows a linear differential equation during training. The
+                   convergence is fastest along the largest kernel principal
+                   components of the input data with respect to the NTK, hence
+                   suggesting a theoretical motivation for early stopping.
+                   Finally we study the NTK numerically, observe its behavior
+                   for wide networks, and compare it to the infinite-width
+                   limit.",
+  month         =  jun,
+  year          =  2018,
+  archivePrefix = "arXiv",
+  primaryClass  = "cs.LG",
+  eprint        = "1806.07572"
+}
+
+@ARTICLE{Arora2019-uc,
+  title         = "On Exact Computation with an Infinitely Wide Neural Net",
+  author        = "Arora, Sanjeev and Du, Simon S and Hu, Wei and Li, Zhiyuan
+                   and Salakhutdinov, Ruslan and Wang, Ruosong",
+  abstract      = "How well does a classic deep net architecture like AlexNet
+                   or VGG19 classify on a standard dataset such as CIFAR-10
+                   when its width --- namely, number of channels in
+                   convolutional layers, and number of nodes in fully-connected
+                   internal layers --- is allowed to increase to infinity? Such
+                   questions have come to the forefront in the quest to
+                   theoretically understand deep learning and its mysteries
+                   about optimization and generalization. They also connect
+                   deep learning to notions such as Gaussian processes and
+                   kernels. A recent paper [Jacot et al., 2018] introduced the
+                   Neural Tangent Kernel (NTK) which captures the behavior of
+                   fully-connected deep nets in the infinite width limit
+                   trained by gradient descent; this object was implicit in
+                   some other recent papers. An attraction of such ideas is
+                   that a pure kernel-based method is used to capture the power
+                   of a fully-trained deep net of infinite width. The current
+                   paper gives the first efficient exact algorithm for
+                   computing the extension of NTK to convolutional neural nets,
+                   which we call Convolutional NTK (CNTK), as well as an
+                   efficient GPU implementation of this algorithm. This results
+                   in a significant new benchmark for the performance of a pure
+                   kernel-based method on CIFAR-10, being $10\%$ higher than
+                   the methods reported in [Novak et al., 2019], and only $6\%$
+                   lower than the performance of the corresponding finite deep
+                   net architecture (once batch normalization, etc. are turned
+                   off). Theoretically, we also give the first non-asymptotic
+                   proof showing that a fully-trained sufficiently wide net is
+                   indeed equivalent to the kernel regression predictor using
+                   NTK.",
+  month         =  apr,
+  year          =  2019,
+  archivePrefix = "arXiv",
+  primaryClass  = "cs.LG",
+  eprint        = "1904.11955"
+}
+
+@ARTICLE{Yang2019-uu,
+  title         = "Scaling Limits of Wide Neural Networks with Weight Sharing:
+                   Gaussian Process Behavior, Gradient Independence, and Neural
+                   Tangent Kernel Derivation",
+  author        = "Yang, Greg",
+  abstract      = "Several recent trends in machine learning theory and
+                   practice, from the design of state-of-the-art Gaussian
+                   Process to the convergence analysis of deep neural nets
+                   (DNNs) under stochastic gradient descent (SGD), have found
+                   it fruitful to study wide random neural networks. Central to
+                   these approaches are certain scaling limits of such
+                   networks. We unify these results by introducing a notion of
+                   a straightline \textbackslashemph\{tensor program\} that can
+                   express most neural network computations, and we
+                   characterize its scaling limit when its tensors are large
+                   and randomized. From our framework follows (1) the
+                   convergence of random neural networks to Gaussian processes
+                   for architectures such as recurrent neural networks,
+                   convolutional neural networks, residual networks, attention,
+                   and any combination thereof, with or without batch
+                   normalization; (2) conditions under which the
+                   \textbackslashemph\{gradient independence assumption\} --
+                   that weights in backpropagation can be assumed to be
+                   independent from weights in the forward pass -- leads to
+                   correct computation of gradient dynamics, and corrections
+                   when it does not; (3) the convergence of the Neural Tangent
+                   Kernel, a recently proposed kernel used to predict training
+                   dynamics of neural networks under gradient descent, at
+                   initialization for all architectures in (1) without batch
+                   normalization. Mathematically, our framework is general
+                   enough to rederive classical random matrix results such as
+                   the semicircle and the Marchenko-Pastur laws, as well as
+                   recent results in neural network Jacobian singular values.
+                   We hope our work opens a way toward design of even stronger
+                   Gaussian Processes, initialization schemes to avoid gradient
+                   explosion/vanishing, and deeper understanding of SGD
+                   dynamics in modern architectures.",
+  month         =  feb,
+  year          =  2019,
+  archivePrefix = "arXiv",
+  primaryClass  = "cs.NE",
+  eprint        = "1902.04760"
+}
+
+@ARTICLE{Novak2018-qq,
+  title         = "Bayesian Deep Convolutional Networks with Many Channels are
+                   Gaussian Processes",
+  author        = "Novak, Roman and Xiao, Lechao and Lee, Jaehoon and Bahri,
+                   Yasaman and Yang, Greg and Hron, Jiri and Abolafia, Daniel A
+                   and Pennington, Jeffrey and Sohl-Dickstein, Jascha",
+  abstract      = "There is a previously identified equivalence between wide
+                   fully connected neural networks (FCNs) and Gaussian
+                   processes (GPs). This equivalence enables, for instance,
+                   test set predictions that would have resulted from a fully
+                   Bayesian, infinitely wide trained FCN to be computed without
+                   ever instantiating the FCN, but by instead evaluating the
+                   corresponding GP. In this work, we derive an analogous
+                   equivalence for multi-layer convolutional neural networks
+                   (CNNs) both with and without pooling layers, and achieve
+                   state of the art results on CIFAR10 for GPs without
+                   trainable kernels. We also introduce a Monte Carlo method to
+                   estimate the GP corresponding to a given neural network
+                   architecture, even in cases where the analytic form has too
+                   many terms to be computationally feasible. Surprisingly, in
+                   the absence of pooling layers, the GPs corresponding to CNNs
+                   with and without weight sharing are identical. As a
+                   consequence, translation equivariance, beneficial in finite
+                   channel CNNs trained with stochastic gradient descent (SGD),
+                   is guaranteed to play no role in the Bayesian treatment of
+                   the infinite channel limit - a qualitative difference
+                   between the two regimes that is not present in the FCN case.
+                   We confirm experimentally, that while in some scenarios the
+                   performance of SGD-trained finite CNNs approaches that of
+                   the corresponding GPs as the channel count increases, with
+                   careful tuning SGD-trained CNNs can significantly outperform
+                   their corresponding GPs, suggesting advantages from SGD
+                   training compared to fully Bayesian parameter estimation.",
+  month         =  oct,
+  year          =  2018,
+  archivePrefix = "arXiv",
+  primaryClass  = "stat.ML",
+  eprint        = "1810.05148"
+}
+
+@ARTICLE{Lee2017-sm,
+  title         = "Deep Neural Networks as Gaussian Processes",
+  author        = "Lee, Jaehoon and Bahri, Yasaman and Novak, Roman and
+                   Schoenholz, Samuel S and Pennington, Jeffrey and
+                   Sohl-Dickstein, Jascha",
+  abstract      = "It has long been known that a single-layer fully-connected
+                   neural network with an i.i.d. prior over its parameters is
+                   equivalent to a Gaussian process (GP), in the limit of
+                   infinite network width. This correspondence enables exact
+                   Bayesian inference for infinite width neural networks on
+                   regression tasks by means of evaluating the corresponding
+                   GP. Recently, kernel functions which mimic multi-layer
+                   random neural networks have been developed, but only outside
+                   of a Bayesian framework. As such, previous work has not
+                   identified that these kernels can be used as covariance
+                   functions for GPs and allow fully Bayesian prediction with a
+                   deep neural network. In this work, we derive the exact
+                   equivalence between infinitely wide deep networks and GPs.
+                   We further develop a computationally efficient pipeline to
+                   compute the covariance function for these GPs. We then use
+                   the resulting GPs to perform Bayesian inference for wide
+                   deep neural networks on MNIST and CIFAR-10. We observe that
+                   trained neural network accuracy approaches that of the
+                   corresponding GP with increasing layer width, and that the
+                   GP uncertainty is strongly correlated with trained network
+                   prediction error. We further find that test performance
+                   increases as finite-width trained networks are made wider
+                   and more similar to a GP, and thus that GP predictions
+                   typically outperform those of finite-width networks. Finally
+                   we connect the performance of these GPs to the recent theory
+                   of signal propagation in random neural networks.",
+  month         =  nov,
+  year          =  2017,
+  archivePrefix = "arXiv",
+  primaryClass  = "stat.ML",
+  eprint        = "1711.00165"
+}
+
+@ARTICLE{De_G_Matthews2018-vo,
+  title         = "Gaussian Process Behaviour in Wide Deep Neural Networks",
+  author        = "de G. Matthews, Alexander G and Rowland, Mark and Hron, Jiri
+                   and Turner, Richard E and Ghahramani, Zoubin",
+  abstract      = "Whilst deep neural networks have shown great empirical
+                   success, there is still much work to be done to understand
+                   their theoretical properties. In this paper, we study the
+                   relationship between random, wide, fully connected,
+                   feedforward networks with more than one hidden layer and
+                   Gaussian processes with a recursive kernel definition. We
+                   show that, under broad conditions, as we make the
+                   architecture increasingly wide, the implied random function
+                   converges in distribution to a Gaussian process, formalising
+                   and extending existing results by Neal (1996) to deep
+                   networks. To evaluate convergence rates empirically, we use
+                   maximum mean discrepancy. We then compare finite Bayesian
+                   deep networks from the literature to Gaussian processes in
+                   terms of the key predictive quantities of interest, finding
+                   that in some cases the agreement can be very close. We
+                   discuss the desirability of Gaussian process behaviour and
+                   review non-Gaussian alternative models from the literature.",
+  month         =  apr,
+  year          =  2018,
+  archivePrefix = "arXiv",
+  primaryClass  = "stat.ML",
+  eprint        = "1804.11271"
+}
+
+@ARTICLE{Garriga-Alonso2018-jx,
+  title         = "Deep Convolutional Networks as shallow Gaussian Processes",
+  author        = "Garriga-Alonso, Adri{\`a} and Rasmussen, Carl Edward and
+                   Aitchison, Laurence",
+  abstract      = "We show that the output of a (residual) convolutional neural
+                   network (CNN) with an appropriate prior over the weights and
+                   biases is a Gaussian process (GP) in the limit of infinitely
+                   many convolutional filters, extending similar results for
+                   dense networks. For a CNN, the equivalent kernel can be
+                   computed exactly and, unlike ``deep kernels'', has very few
+                   parameters: only the hyperparameters of the original CNN.
+                   Further, we show that this kernel has two properties that
+                   allow it to be computed efficiently; the cost of evaluating
+                   the kernel for a pair of images is similar to a single
+                   forward pass through the original CNN with only one filter
+                   per layer. The kernel equivalent to a 32-layer ResNet
+                   obtains 0.84\% classification error on MNIST, a new record
+                   for GPs with a comparable number of parameters.",
+  month         =  aug,
+  year          =  2018,
+  archivePrefix = "arXiv",
+  primaryClass  = "stat.ML",
+  eprint        = "1808.05587"
+}
+
+
+@MISC{Wilson_undated-sv,
+  title        = "Bayesian neural networks from a Gaussian process perspective",
+  author       = "Wilson, Andrew Gordon",
+  howpublished = "\url{http://gpss.cc/gpss20/slides/Wilson2020_part2.pdf}",
+  note         = "Accessed: 2021-5-26",
+  year = {2020}
+}
+
+@article{shahriari2015taking,
+  title={Taking the human out of the loop: A review of {B}ayesian optimization},
+  author={Shahriari, Bobak and Swersky, Kevin and Wang, Ziyu and Adams, Ryan P and De Freitas, Nando},
+  journal={Proceedings of the IEEE},
+  volume={104},
+  number={1},
+  pages={148--175},
+  year={2015},
+  publisher={IEEE}
+}
