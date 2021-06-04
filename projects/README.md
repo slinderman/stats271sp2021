@@ -4,7 +4,7 @@ The final project is an opportunity to apply what you've learned throughout the 
 
 The project will consist of:
 - Approx. 5pg report with figures and references, or (7-8pg report if working in a team of two). The paper should include intro, background/related work, model, algorithm, results, conclusion. Think of it like a workshop paper for a stat/ML conference.
-- A Jupyter notebook with your code, just like for the homeworks.
+- A Jupyter notebook with your code, just like for the homeworks. If it doesn't fit in a single notebook, just give us a Github link.
 - A virtual poster presentation on the last day of class, June 2nd. (More info coming soon, but I’m hoping to use GatherTown.) Your "poster" will be 1-3 slides that you'll present via screenshare in GatherTown.
 
 To give you a sense of what we're expecting:
